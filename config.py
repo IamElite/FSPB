@@ -54,8 +54,8 @@ DB_SHORT = os.environ.get("DB_SHORT", "short11")
 CHANNEL_ID = int(os.environ.get("CHANNEL_ID", "-1002611158964")) #database save channel id 
 FORCE_SUB_CHANNEL = int(os.environ.get("FORCE_SUB_CHANNEL", "-1002583429026"))
 FORCE_SUB_CHANNEL2 = int(os.environ.get("FORCE_SUB_CHANNEL2", "-1002554824067"))
-FORCE_SUB_CHANNEL3 = int(os.environ.get("FORCE_SUB_CHANNEL3", "0"))
-FORCE_SUB_CHANNEL4 = int(os.environ.get("FORCE_SUB_CHANNEL4", "0"))
+FORCE_SUB_CHANNEL3 = int(os.environ.get("FORCE_SUB_CHANNEL3", "-1002554824067"))
+FORCE_SUB_CHANNEL4 = int(os.environ.get("FORCE_SUB_CHANNEL4", "-1002554824067"))
 
 #Shortner (token system) 
 SHORTLINK_URL = os.environ.get("SHORTLINK_URL", "shrinkforearn.in") 
