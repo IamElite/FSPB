@@ -58,8 +58,8 @@ FORCE_SUB_CHANNEL3 = int(os.environ.get("FORCE_SUB_CHANNEL3", "0"))
 FORCE_SUB_CHANNEL4 = int(os.environ.get("FORCE_SUB_CHANNEL4", "0"))
 
 #Shortner (token system) 
-SHORTLINK_URL = os.environ.get("SHORTLINK_URL", "easysky.in") 
-SHORTLINK_API = os.environ.get("SHORTLINK_API", "d0bd39b74ba59be6c945ead29e38f62cc5a9239f")
+SHORTLINK_URL = os.environ.get("SHORTLINK_URL", "shrinkforearn.in") 
+SHORTLINK_API = os.environ.get("SHORTLINK_API", "7d14f3e827450b979c653d5fcae203bd85806983")
 VERIFY_EXPIRE = int(os.environ.get('VERIFY_EXPIRE', 43200)) # Add time in seconds
 IS_VERIFY = os.environ.get("IS_VERIFY", "True")
 TUT_VID = os.environ.get("TUT_VID", "https://t.me/Phdlust_Premium_Proof/12")
