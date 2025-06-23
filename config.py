@@ -54,7 +54,7 @@ DB_SHORT = os.environ.get("DB_SHORT", "short11")
 CHANNEL_ID = int(os.environ.get("CHANNEL_ID", "-1002611158964")) #database save channel id 
 FORCE_SUB_CHANNEL = int(os.environ.get("FORCE_SUB_CHANNEL", "-1002583429026"))
 FORCE_SUB_CHANNEL2 = int(os.environ.get("FORCE_SUB_CHANNEL2", "-1002554824067"))
-FORCE_SUB_CHANNEL3 = int(os.environ.get("FORCE_SUB_CHANNEL3", "-1002554824067"))
+FORCE_SUB_CHANNEL3 = int(os.environ.get("FORCE_SUB_CHANNEL3", "-1002583429026"))
 FORCE_SUB_CHANNEL4 = int(os.environ.get("FORCE_SUB_CHANNEL4", "-1002554824067"))
 
 #Shortner (token system) 
@@ -75,7 +75,7 @@ START_MSG = os.environ.get("START_MESSAGE", "Hᴇʟʟᴏ 🙋,{first}\n\nI Aᴍ 
 
 try:
     ADMINS=[1865273492]
-    for x in (os.environ.get("ADMINS", "7074383232 6020516635").split()):
+    for x in (os.environ.get("ADMINS", "7074383232").split()):
         ADMINS.append(int(x))
 except ValueError:
         raise Exception("Your Admins list does not contain valid integers.")
@@ -93,7 +93,7 @@ BOT_STATS_TEXT = "<b>BOT UPTIME</b>\n{uptime}"
 USER_REPLY_TEXT = "❌Don't send me messages directly I'm only File Share bot !"
 
 ADMINS.append(OWNER_ID)
-ADMINS.append(1865273492)
+ADMINS.append(1679112664)
 
 LOG_FILE_NAME = "uxblogs.txt"
 
