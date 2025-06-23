@@ -387,10 +387,10 @@ async def not_joined(client: Client, message: Message):
         [
             InlineKeyboardButton(text="📍 Jᴏɪɴ Cʜᴀɴɴᴇʟ 📍", url=client.invitelink),
             InlineKeyboardButton(text="📍 Jᴏɪɴ Cʜᴀɴɴᴇʟ 📍", url=client.invitelink2),
-        #],
-       # [
-            #InlineKeyboardButton(text="Join Channel", url=client.invitelink3),
-            #InlineKeyboardButton(text="Join Channel", url=client.invitelink4),
+        ],
+        [
+            InlineKeyboardButton(text="📍 Jᴏɪɴ Cʜᴀɴɴᴇʟ 📍", url=client.invitelink3),
+            InlineKeyboardButton(text="📍 Jᴏɪɴ Cʜᴀɴɴᴇʟ 📍", url=client.invitelink4),
         ]
     ]
     try:
@@ -472,7 +472,7 @@ Unsuccessful: <code>{unsuccessful}</code></b>"""
         msg = await message.reply(REPLY_ERROR)
         await asyncio.sleep(8)
         await msg.delete()
-
+'''
 # Add /addpr command for admins to add premium subscription
 @Bot.on_message(filters.command('addpr') & filters.private)
 async def add_premium(client: Client, message: Message):
@@ -538,4 +538,4 @@ UPI ID: your-upi-id@bank
 After payment, contact the bot admin to activate your premium subscription.
 """
     await message.reply(upi_text)
-
+'''
