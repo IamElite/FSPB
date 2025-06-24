@@ -15,12 +15,6 @@ OWNER_USERNAME = os.environ.get('OWNER_USERNAME', 'OfficialDurgesh')
 SUPPORT_GROUP = os.environ.get("SUPPORT_GROUP", "net_pro_max") # WITHOUR @
 CHANNEL = os.environ.get("CHANNEL", "net_pro_max") # WITHOUR @
 
-#pic
-FORCE_PIC = os.environ.get("FORCE_PIC", "https://envs.sh/Ysc.jpg")
-START_PIC = os.environ.get("START_PIC", "https://envs.sh/YLM.jpg")
-TOKEN_PIC = os.environ.get("TOKEN_PIC", "https://envs.sh/Ysj.jpg")
-PRM_PIC = os.environ.get("PRM_PIC", "https://ibb.co/DDVcm3yS")
-
 #auto delete
 DELETE_AFTER = int(os.environ.get("DELETE_AFTER", '2400')) #seconds
 NOTIFICATION_TIME = int(os.environ.get('NOTIFICATION_TIME', 30)) #seconds
