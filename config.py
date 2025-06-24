@@ -52,10 +52,10 @@ DB_DELETE = os.environ.get("DB_DELETE", "del11")
 DB_SHORT = os.environ.get("DB_SHORT", "short11")
 
 CHANNEL_ID = int(os.environ.get("CHANNEL_ID", "-1002611158964")) #database save channel id 
-FORCE_SUB_CHANNEL = int(os.environ.get("FORCE_SUB_CHANNEL", "-1002583429026"))
-FORCE_SUB_CHANNEL2 = int(os.environ.get("FORCE_SUB_CHANNEL2", "-1002554824067"))
-FORCE_SUB_CHANNEL3 = int(os.environ.get("FORCE_SUB_CHANNEL3", "-1002583429026"))
-FORCE_SUB_CHANNEL4 = int(os.environ.get("FORCE_SUB_CHANNEL4", "-1002554824067"))
+# Format: space-separated channel IDs, e.g., "-1002583429026 -1002554824067"
+FORCE_SUB_CHANNELS = os.environ.get("FORCE_SUB_CHANNELS", "-1002583429026 -1002554824067").split()
+# Convert channel IDs to integers
+FORCE_SUB_CHANNELS = [int(channel_id) for channel_id in FORCE_SUB_CHANNELS]
 
 #Shortner (token system) 
 SHORTLINK_URL = os.environ.get("SHORTLINK_URL", "shrinkforearn.in") 
@@ -71,7 +71,7 @@ SECONDS = int(os.getenv("SECONDS", "200")) # auto delete in seconds
 
 PORT = os.environ.get("PORT", "8080")
 TG_BOT_WORKERS = int(os.environ.get("TG_BOT_WORKERS", "4"))
-START_MSG = os.environ.get("START_MESSAGE", "Hᴇʟʟᴏ 🙋,{first}\n\nI Aᴍ A Aᴘᴋ Sᴛᴏʀᴇ Bᴏᴛ Cʜᴇᴄᴋᴏᴜᴛ Oᴜʀ Cʜᴀɴɴᴇʟꜱ Tᴏ Gᴇᴛ Dɪʀᴇᴄᴛ Fɪʟᴇ Tʜʀᴏᴜɢʜ Mᴇ\n\n~ Bᴏᴛ Bʏ @x0doit")
+START_MSG = os.environ.get("START_MESSAGE", "Hᴇʟʟᴏ 🙋,{first}\n\nI Aᴍ A Aᴋ Sᴛᴏʀᴇ Bᴏᴛ Cʜᴇᴄᴋᴏᴜᴛ Oᴜʀ Cʜᴀɴɴᴇʟꜱ Tᴏ Gᴇᴛ Dɪʀᴇᴄᴛ Fɪʟᴇ Tʜʀᴏᴜɢʜ Mᴇ\n\n~ Bᴏᴛ Bʏ @x0doit")
 
 try:
     ADMINS=[1865273492]
