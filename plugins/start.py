@@ -20,6 +20,7 @@ from config import *
 from helper_func import *
 from database.database import *
 from shortzy import Shortzy
+from img import FORCE_PICS, START_PICS, TOKEN_PICS, PRM_PICS, get_random_image
 
 #delete_after = 600
 
@@ -170,7 +171,6 @@ async def delete_notification_after_delay(client, chat_id, message_id, delay):
 temp_msg = await message.reply("Please wait...")
 '''
 
-        
 @Client.on_message(filters.command("start") & filters.private & subscribed)
 async def start_command(client: Client, message):
     user_id = message.from_user.id
@@ -217,7 +217,7 @@ async def start_command(client: Client, message):
                 short_link = linkb
                 caption = "🔰 Yᴏᴜ Aʀᴇ Pʀᴇᴍɪᴜᴍ Uꜱᴇʀ ✅\nCʟɪᴄᴋ Bᴇʟᴏᴡ Bᴜᴛᴛᴏɴ Tᴏ Wᴀᴛᴄʜ Dɪʀᴇᴄᴛʟʏ"
                 button_text = "Cʟɪᴄᴋ Tᴏ Wᴀᴛᴄʜ"
-                po = PRM_PIC
+                po = get_random_image(PRM_PICS)
             else:
                 # Generate a shortened link for non-premium users
                 shortener_ids = ["myshortener1", "myshortener2", "myshortener3"]
@@ -231,7 +231,7 @@ async def start_command(client: Client, message):
 
                 caption = SHORTCAP  # Use default caption for non-premium users
                 button_text = "Short Link"
-                po = TOKEN_PIC
+                po = get_random_image(TOKEN_PICS)
 
             if not short_link:
                 await message.reply("Failed to generate a short link.\ncontact admin @Professor2547 ")
@@ -355,7 +355,7 @@ async def start_command(client: Client, message):
         )
         
         sent_message = await message.reply_photo(
-            photo=START_PIC,
+            photo=get_random_image(START_PICS),
             caption=START_MSG.format(
                     first=message.from_user.first_name,
                     last=message.from_user.last_name,
@@ -383,40 +383,34 @@ REPLY_ERROR = """<code>Use this command as a replay to any telegram message with
     
 @Bot.on_message(filters.command('start') & filters.private)
 async def not_joined(client: Client, message: Message):
-    buttons = [
-        [
-            InlineKeyboardButton(text="📍 Jᴏɪɴ Cʜᴀɴɴᴇʟ 📍", url=client.invitelink),
-            InlineKeyboardButton(text="📍 Jᴏɪɴ Cʜᴀɴɴᴇʟ 📍", url=client.invitelink2),
-        ],
-        [
-            InlineKeyboardButton(text="📍 Jᴏɪɴ Cʜᴀɴɴᴇʟ 📍", url=client.invitelink3),
-            InlineKeyboardButton(text="📍 Jᴏɪɴ Cʜᴀɴɴᴇʟ 📍", url=client.invitelink4),
-        ]
-    ]
+    # Create 2x2 grid of join buttons for all FORCE_SUB_CHANNELS
+    join_buttons = []
+    links = list(client.invitelinks.values())
+    for i in range(0, len(links), 2):
+        row = []
+        for link in links[i:i+2]:
+            row.append(InlineKeyboardButton(text="📍 Jᴏɪɴ Cʜᴀɴɴᴇʟ 📍", url=link))
+        join_buttons.append(row)
     try:
-        buttons.append(
-            [
-                InlineKeyboardButton(
-                    text = 'Try Again',
-                    url = f"https://t.me/{client.username}?start={message.command[1]}"
-                )
-            ]
-        )
+        join_buttons.append([
+            InlineKeyboardButton(
+                text = 'Try Again',
+                url = f"https://t.me/{client.username}?start={message.command[1]}"
+            )
+        ])
     except IndexError:
         pass
 
     await message.reply_photo(
-        photo=FORCE_PIC,  # This can be a URL or a file path
+        photo=get_random_image(FORCE_PICS),
         caption=FORCE_MSG.format(
-                first = message.from_user.first_name,
-                last = message.from_user.last_name,
-                username = None if not message.from_user.username else '@' + message.from_user.username,
-                mention = message.from_user.mention,
-                id = message.from_user.id
-            ),
-        reply_markup = InlineKeyboardMarkup(buttons),
-        quote = True,
-        #disable_web_page_preview = True
+            first=message.from_user.first_name,
+            last=message.from_user.last_name,
+            username=None if not message.from_user.username else '@' + message.from_user.username,
+            mention=message.from_user.mention,
+            id=message.from_user.id
+        ),
+        reply_markup=InlineKeyboardMarkup(join_buttons)
     )
 
 
