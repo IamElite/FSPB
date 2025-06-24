@@ -1,4 +1,3 @@
-# https://t.me/Ultroid_Official/524
 
 
 from aiohttp import web
@@ -14,7 +13,7 @@ import pyrogram.utils
 pyrogram.utils.MIN_CHAT_ID = -999999999999
 pyrogram.utils.MIN_CHANNEL_ID = -100999999999999
 
-name ="""By @ultroid_official From Telegram"""
+name ="""DURGESH"""
 
 
 class Bot(Client):
@@ -49,7 +48,7 @@ class Bot(Client):
                 self.LOGGER(__name__).warning(a)
                 self.LOGGER(__name__).warning(f"Bot can't Export Invite link from Force Sub Channel! Channel ID: {channel_id}")
                 self.LOGGER(__name__).warning(f"Please Double check the FORCE_SUB_CHANNELS value and Make sure Bot is Admin in channel with Invite Users via Link Permission, Current Channel ID: {channel_id}")
-                self.LOGGER(__name__).info("\nBot Stopped. https://t.me/ultroid_official for support")
+                self.LOGGER(__name__).info("\nBot Stopped.")
                 sys.exit()
 
         try:
@@ -60,16 +59,11 @@ class Bot(Client):
         except Exception as e:
             self.LOGGER(__name__).warning(e)
             self.LOGGER(__name__).warning(f"Make Sure bot is Admin in DB Channel, and Double check the CHANNEL_ID Value, Current Value {CHANNEL_ID}")
-            self.LOGGER(__name__).info("\nBot Stopped. Join https://t.me/ultroid_official for support")
+            self.LOGGER(__name__).info("\nBot Stopped. Join")
             sys.exit()
 
         self.set_parse_mode(ParseMode.HTML)
-        self.LOGGER(__name__).info(f"Bot Running..!\n\nCreated by \nhttps://t.me/ultroid_official")
-        self.LOGGER(__name__).info(f""" \n\n 
-        bot running...!
-(っ◔◡◔)っ ♥ ULTROIDOFFICIAL ♥
-░╚════╝░░╚════╝░╚═════╝░╚══════╝
-                                         """)
+        self.LOGGER(__name__).info(f"Bot Running..!")
         self.username = usr_bot_me.username
         #web-response
         app = web.AppRunner(await web_server())
@@ -79,11 +73,4 @@ class Bot(Client):
 
     async def stop(self, *args):
         await super().stop()
-        self.LOGGER(__name__).info("Bot stopped , https://t.me/ultroid_official.")
-            
-
-
-
-
-
-# https://t.me/Ultroid_Official/524
+        self.LOGGER(__name__).info("Bot stopped")
