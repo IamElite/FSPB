@@ -6,8 +6,9 @@ def get_random_image(image_list):
     return random.choice(image_list) if image_list else None
 
 FORCE_PICS = [
-    "https://envs.sh/Ysc.jpg",
-    "https://envs.sh/Ysc.jpg",
+    "https://files.catbox.moe/hsddef.jpg", "https://files.catbox.moe/i5cdw7.jpg",
+    "https://files.catbox.moe/71zuiz.jpg", "https://files.catbox.moe/srhhin.jpg",
+    "https://files.catbox.moe/o48aps.jpg", "https://files.catbox.moe/w3y71w.jpg",
     # Add more image URLs as needed
 ]
 START_PICS = [
@@ -21,8 +22,9 @@ TOKEN_PICS = [
     # Add more image URLs as needed
 ]
 PRM_PICS = [
-    "https://ibb.co/DDVcm3yS",
-    "https://ibb.co/DDVcm3yS",
+    "https://ibb.co/DDVcm3yS", "https://files.catbox.moe/kbpyao.jpg",
+    "https://files.catbox.moe/a23sv9.png", "https://files.catbox.moe/ec3k5k.jpg",
+    "https://files.catbox.moe/hw2t6o.jpg", "https://files.catbox.moe/haibmn.jpg",
     # Add more image URLs as needed
 ]
 
