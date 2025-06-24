@@ -53,7 +53,7 @@ DB_SHORT = os.environ.get("DB_SHORT", "short11")
 
 CHANNEL_ID = int(os.environ.get("CHANNEL_ID", "-1002611158964")) #database save channel id 
 # Format: space-separated channel IDs, e.g., "-1002583429026 -1002554824067"
-FORCE_SUB_CHANNELS = os.environ.get("FORCE_SUB_CHANNELS", "-1002583429026 -1002554824067").split()
+FORCE_SUB_CHANNELS = os.environ.get("FORCE_SUB_CHANNELS", "0").split()
 # Convert channel IDs to integers
 FORCE_SUB_CHANNELS = [int(channel_id) for channel_id in FORCE_SUB_CHANNELS]
 
