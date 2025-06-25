@@ -6,7 +6,7 @@ from pyrogram.types import Message
 from pyrogram.enums import ChatMemberStatus
 from config import FORCE_SUB_CHANNELS, ADMINS
 from pyrogram.errors.exceptions.bad_request_400 import UserNotParticipant
-from pyrogram.errors import FloodWait
+from pyrogram.errors import FloodWait, UserNotParticipant, PeerIdInvalid
 #----Token
 from shortzy import Shortzy
 import requests
