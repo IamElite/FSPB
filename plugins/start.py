@@ -333,40 +333,28 @@ REPLY_ERROR = """<code>Use this command as a replay to any telegram message with
     
 @Bot.on_message(filters.command("start") & filters.private)
 async def not_joined(client: Client, message: Message):
-    buttons = []
     user_id = message.from_user.id
+    buttons, row = [], []
 
-    temp_row = []
     for i, ch in enumerate(FORCE_SUB_CHANNELS):
         try:
-            # Directly try to export invite link
             url = await client.export_chat_invite_link(ch)
-            temp_row.append(InlineKeyboardButton(f"📍 Join {i+1} 📍", url=url))
+            row.append(InlineKeyboardButton(f"📍 Join Fast{i+1} 📍", url=url))
+            if len(row) == 2:
+                buttons.append(row)
+                row = []
+        except: pass
 
-            if len(temp_row) == 2:
-                buttons.append(temp_row)
-                temp_row = []
+    if row: buttons.append(row)
 
-        except Exception as e:
-            print(f"Invite link fetch error for {ch}: {e}")
-            if len(temp_row) == 2:
-                buttons.append(temp_row)
-                temp_row = []
+    try_again = []
+    if len(message.command) > 1:
+        try_again = [InlineKeyboardButton("🔁 Try Again", url=f"https://t.me/{client.username}?start={message.command[1]}")]
 
-    if temp_row:
-        buttons.append(temp_row)
-
-    try_again_button = []
-    try:
-        start_param = message.command[1]
-        try_again_button = [InlineKeyboardButton("🔁 Try Again", url=f"https://t.me/{client.username}?start={start_param}")]
-    except IndexError:
-        pass
-
-    buttons.append(try_again_button)
+    if try_again: buttons.append(try_again)
 
     await message.reply_photo(
-        photo=get_random_image(FORCE_PICS),
+        photo=get_random_image(FORCE_PIC),
         caption=FORCE_MSG.format(
             first=message.from_user.first_name,
             last=message.from_user.last_name,
@@ -377,12 +365,6 @@ async def not_joined(client: Client, message: Message):
         reply_markup=InlineKeyboardMarkup(buttons),
         quote=True
     )
-
-
-# ✅ Callback handler for broken or expired invite button
-@Bot.on_callback_query(filters.regex("invite_invalid"))
-async def handle_invalid_invite(client, callback_query):
-    await callback_query.answer("This invite link is invalid or has expired.", show_alert=True)
 
 
 
