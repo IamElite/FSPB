@@ -331,43 +331,40 @@ REPLY_ERROR = """<code>Use this command as a replay to any telegram message with
 #=====================================================================================##
 
     
-@Bot.on_message(filters.command('start') & filters.private)
+@Bot.on_message(filters.command("start") & filters.private)
 async def not_joined(client: Client, message: Message):
     buttons = []
-
-    for i, channel_id in enumerate(FORCE_SUB_CHANNELS):
+    for i, ch in enumerate(FORCE_SUB_CHANNELS):
         try:
-            invite_link = await client.export_chat_invite_link(channel_id)
-            buttons.append([InlineKeyboardButton(text=f"📍 Join Channel {i+1} 📍", url=invite_link)])
+            invite = await client.export_chat_invite_link(ch)
+            buttons.append([InlineKeyboardButton(f"📍 Join Channel {i+1} 📍", url=invite)])
         except Exception as e:
-            print(f"Error getting invite link for channel {channel_id}: {e}")
-            continue
+            print(f"Invite link fetch error for {ch}: {e}")
 
-    if buttons:
-        try:
-            buttons.append([
-                InlineKeyboardButton(
-                    text='🔁 Try Again',
-                    url=f"https://t.me/{client.username}?start={message.command[1]}"
-                )
-            ])
-        except IndexError:
-            pass
+    if not buttons:
+        return await message.reply("❌ Bot not admin in channels or links failed.")
 
-        await message.reply_photo(
-            photo=get_random_image(FORCE_PICS),
-            caption=FORCE_MSG.format(
-                first=message.from_user.first_name,
-                last=message.from_user.last_name,
-                username='@' + message.from_user.username if message.from_user.username else None,
-                mention=message.from_user.mention,
-                id=message.from_user.id
-            ),
-            reply_markup=InlineKeyboardMarkup(buttons),
-            quote=True
-        )
-    else:
-        await message.reply("❌ Channel invite links not found or bot is not admin in those channels.")
+    try_again_button = []
+    try:
+        start_param = message.command[1]
+        try_again_button = [InlineKeyboardButton("🔁 Try Again", url=f"https://t.me/{client.username}?start={start_param}")]
+    except IndexError:
+        pass
+
+    buttons.append(try_again_button)
+
+    await message.reply_photo(
+        photo=get_random_image(FORCE_PICS),
+        caption=FORCE_MSG.format(
+            first=message.from_user.first_name,
+            last=message.from_user.last_name,
+            username=("@" + message.from_user.username) if message.from_user.username else None,
+            mention=message.from_user.mention,
+            id=message.from_user.id
+        ),
+        reply_markup=InlineKeyboardMarkup(buttons),
+        quote=True
+    )
 
 
 
