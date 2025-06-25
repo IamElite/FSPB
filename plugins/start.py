@@ -383,24 +383,28 @@ REPLY_ERROR = """<code>Use this command as a replay to any telegram message with
     
 @Bot.on_message(filters.command('start') & filters.private)
 async def not_joined(client: Client, message: Message):
-    # Create 2x2 grid of join buttons for all FORCE_SUB_CHANNELS
+    # Ensure invite links are available
+    links = list(getattr(client, 'invitelinks', {}).values())
     join_buttons = []
-    links = list(client.invitelinks.values())
+    if not links:
+        # No channels configured, inform the user
+        await message.reply_text("No channels to join. Please contact the admin.")
+        return
+    # Create 2x2 grid of join buttons
     for i in range(0, len(links), 2):
         row = []
         for link in links[i:i+2]:
             row.append(InlineKeyboardButton(text="📍 Jᴏɪɴ Cʜᴀɴɴᴇʟ 📍", url=link))
         join_buttons.append(row)
-    try:
-        join_buttons.append([
-            InlineKeyboardButton(
-                text = 'Try Again',
-                url = f"https://t.me/{client.username}?start={message.command[1]}"
-            )
-        ])
-    except IndexError:
-        pass
-
+    # Add Try Again button (always present, handles missing argument)
+    start_arg = message.command[1] if len(message.command) > 1 else ''
+    try_again_url = f"https://t.me/{getattr(client, 'username', 'BotUsername')}?start={start_arg}"
+    join_buttons.append([
+        InlineKeyboardButton(
+            text='Try Again',
+            url=try_again_url
+        )
+    ])
     await message.reply_photo(
         photo=get_random_image(FORCE_PICS),
         caption=FORCE_MSG.format(
@@ -412,6 +416,7 @@ async def not_joined(client: Client, message: Message):
         ),
         reply_markup=InlineKeyboardMarkup(join_buttons)
     )
+
 
 
 
