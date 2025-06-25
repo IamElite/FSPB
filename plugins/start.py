@@ -331,59 +331,42 @@ REPLY_ERROR = """<code>Use this command as a replay to any telegram message with
 #=====================================================================================##
 
     
-@Bot.on_message(filters.command("start") & filters.private)
-async def not_joined(client, message: Message):
-    links = []
-    join_buttons = []
+@Client.on_message(filters.command('start') & filters.private)
+async def not_joined(client: Client, message: Message):
+    buttons = []
 
-    if not hasattr(client, 'invitelinks'):
-        client.invitelinks = {}
-
-    for channel_id in FORCE_SUB_CHANNELS:
+    for i, channel_id in enumerate(FORCE_SUB_CHANNELS):
         try:
-            chat = await client.get_chat(channel_id)
-            invite = client.invitelinks.get(channel_id)
-
-            if not invite:
-                invite_obj = await client.create_chat_invite_link(chat.id, creates_join_request=False)
-                invite = invite_obj.invite_link
-                client.invitelinks[channel_id] = invite
-
-            if invite:
-                links.append(invite)
-
-        except Exception as e:
+            invite_link = await client.export_chat_invite_link(channel_id)
+            buttons.append(
+                [InlineKeyboardButton(text=f"📍 Join Channel {i+1} 📍", url=invite_link)]
+            )
+        except:
             continue
 
-    if not links:
-        await message.reply_text("Bot is not admin in any force subscribe channel or no channels configured. Please contact admin.")
-        return
-
-    # 2x2 button grid
-    for i in range(0, len(links), 2):
-        row = [
-            InlineKeyboardButton("📍 Jᴏɪɴ Cʜᴀɴɴᴇʟ 📍", url=link)
-            for link in links[i:i + 2]
-        ]
-        join_buttons.append(row)
-
-    start_arg = message.command[1] if len(message.command) > 1 else ''
-    try_again_url = f"https://t.me/{getattr(client, 'username', 'BotUsername')}?start={start_arg}"
-
-    join_buttons.append([
-        InlineKeyboardButton("🔄 Try Again", url=try_again_url)
-    ])
+    try:
+        buttons.append(
+            [
+                InlineKeyboardButton(
+                    text='Try Again',
+                    url=f"https://t.me/{client.username}?start={message.command[1]}"
+                )
+            ]
+        )
+    except IndexError:
+        pass
 
     await message.reply_photo(
-        photo=get_random_image(FORCE_PICS),
+        photo=FORCE_PIC,
         caption=FORCE_MSG.format(
             first=message.from_user.first_name,
             last=message.from_user.last_name,
-            username='@' + message.from_user.username if message.from_user.username else 'N/A',
+            username=None if not message.from_user.username else '@' + message.from_user.username,
             mention=message.from_user.mention,
             id=message.from_user.id
         ),
-        reply_markup=InlineKeyboardMarkup(join_buttons)
+        reply_markup=InlineKeyboardMarkup(buttons),
+        quote=True
     )
 
 
