@@ -244,8 +244,7 @@ async def start_command(client: Client, message):
                 [InlineKeyboardButton("✨ Premium", callback_data="upi_info")]
             ]
 
-            verification_message = await message.reply_photo(
-                #photo=po,
+            verification_message = await message.reply(
                 caption=caption,
                 reply_markup=InlineKeyboardMarkup(buttons),
                 #protect_content=PROTECT_CONTENT,
