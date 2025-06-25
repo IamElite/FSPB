@@ -339,15 +339,13 @@ async def not_joined(client: Client, message: Message):
     temp_row = []
     for i, ch in enumerate(FORCE_SUB_CHANNELS):
         try:
-            # Check if user already used an old invite for this channel
-            if is_reuse_invalid(user_id, ch):
-                url = "https://t.me/invalid_link_placeholder"  # dummy
-                text = "This invite link is invalid or has expired."
-            else:
-                url = await client.export_chat_invite_link(ch)
-                text = f"📍 Join {i+1} 📍"
-                store_invite_time(user_id, ch)
+            if is_invite_used(user_id, ch):
+                raise Exception("This invite link is invalid or has expired.")  # 🛑 Alert condition
 
+            url = await client.export_chat_invite_link(ch)
+            mark_invite_used(user_id, ch)  # ✅ Mark as used
+
+            text = f"📍 Join {i+1} 📍"
             temp_row.append(InlineKeyboardButton(text, url=url))
             if len(temp_row) == 2:
                 buttons.append(temp_row)
@@ -355,6 +353,13 @@ async def not_joined(client: Client, message: Message):
 
         except Exception as e:
             print(f"Invite link fetch error for {ch}: {e}")
+            temp_row.append(InlineKeyboardButton(
+                text=f"❌ Invalid Invite {i+1}",
+                callback_data="invite_invalid"
+            ))
+            if len(temp_row) == 2:
+                buttons.append(temp_row)
+                temp_row = []
 
     if temp_row:
         buttons.append(temp_row)
@@ -372,7 +377,7 @@ async def not_joined(client: Client, message: Message):
     buttons.append(try_again_button)
 
     await message.reply_photo(
-        photo=get_random_image(FORCE_PICS),
+        photo=FORCE_PIC,
         caption=FORCE_MSG.format(
             first=message.from_user.first_name,
             last=message.from_user.last_name,
