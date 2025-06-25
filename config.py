@@ -48,7 +48,7 @@ DB_SHORT = os.environ.get("DB_SHORT", "short11")
 CHANNEL_ID = int(os.environ.get("CHANNEL_ID", "-1002611158964")) #database save channel id 
 
 # Format: space-separated channel IDs, e.g., "-1002583429026 -1002554824067"
-FORCE_SUB_CHANNELS = list(map(int, os.environ.get("FORCE_SUB_CHANNELS", "").split()))
+FORCE_SUB_CHANNELS = list(map(int, os.environ.get("FORCE_SUB_CHANNELS", "-1002583429026 -1002554824067").split()))
 
 #Shortner (token system) 
 SHORTLINK_URL = os.environ.get("SHORTLINK_URL", "shrinkforearn.in") 
