@@ -14,26 +14,24 @@ import time
 from datetime import datetime
 from database.database import user_data, db_verify_status, db_update_verify_status
 
-async def is_subscribed(filter, client, update: Message):
-    if not FORCE_SUB_CHANNELS:
-        return True
-
-    user_id = update.from_user.id
+async def is_subscribed(_, client, message: Message):
+    user_id = message.from_user.id
 
     if user_id in ADMINS:
         return True
 
-    allowed_status = (ChatMemberStatus.OWNER, ChatMemberStatus.ADMINISTRATOR, ChatMemberStatus.MEMBER)
-
     for channel_id in FORCE_SUB_CHANNELS:
         try:
-            member = await client.get_chat_member(chat_id=channel_id, user_id=user_id)
+            member = await client.get_chat_member(channel_id, user_id)
+            if member.status not in (
+                ChatMemberStatus.OWNER,
+                ChatMemberStatus.ADMINISTRATOR,
+                ChatMemberStatus.MEMBER,
+            ):
+                return False
         except UserNotParticipant:
             return False
-        except Exception as e:
-            return False
-
-        if member.status not in allowed_status:
+        except Exception:
             return False
 
     return True
