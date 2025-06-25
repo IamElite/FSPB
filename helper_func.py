@@ -22,18 +22,23 @@ async def is_subscribed(filter, client, update):
     if user_id in ADMINS:
         return True
 
-    member_status = ChatMemberStatus.OWNER, ChatMemberStatus.ADMINISTRATOR, ChatMemberStatus.MEMBER
+    member_status = [ChatMemberStatus.OWNER, 
+                    ChatMemberStatus.ADMINISTRATOR, 
+                    ChatMemberStatus.MEMBER]
 
     for channel_id in FORCE_SUB_CHANNELS:
         try:
             member = await client.get_chat_member(chat_id=channel_id, user_id=user_id)
+            if member.status not in member_status:
+                return False
         except UserNotParticipant:
             return False
-
-        if member.status not in member_status:
-            return False
+        except Exception as e:
+            print(f"Error checking subscription: {e}")
+            continue
 
     return True
+
 
 async def encode(string):
     string_bytes = string.encode("ascii")
