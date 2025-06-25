@@ -34,6 +34,16 @@ async def is_subscribed(_, client, message):
 
     return True
 
+used_invites = {}
+
+def is_invite_used(user_id, channel_id):
+    return used_invites.get(user_id, {}).get(channel_id, False)
+
+def mark_invite_used(user_id, channel_id):
+    if user_id not in used_invites:
+        used_invites[user_id] = {}
+    used_invites[user_id][channel_id] = True
+
 
 async def encode(string):
     string_bytes = string.encode("ascii")
