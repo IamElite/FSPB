@@ -14,36 +14,32 @@ import time
 from datetime import datetime
 from database.database import user_data, db_verify_status, db_update_verify_status
 
-async def is_subscribed(_, client, message: Message):
-    user_id = message.from_user.id
-    print(f"[FSUB] Checking subscription for user: {user_id}")
 
-    if user_id in ADMINS:
-        print("[FSUB] User is admin, skipping check")
+async def is_subscribed(filter, client, update):
+    if not FORCE_SUB_CHANNELS:
         return True
 
+    user_id = update.from_user.id
+
+    if user_id in ADMINS:
+        return True
+
+    member_status = (ChatMemberStatus.OWNER, ChatMemberStatus.ADMINISTRATOR, ChatMemberStatus.MEMBER)
+
     for channel_id in FORCE_SUB_CHANNELS:
+        if not channel_id:
+            continue
+
         try:
-            print(f"[FSUB] Checking channel: {channel_id}")
-            member = await client.get_chat_member(channel_id, user_id)
-            print(f"[FSUB] Member status: {member.status}")
-
-            if member.status not in (
-                ChatMemberStatus.OWNER,
-                ChatMemberStatus.ADMINISTRATOR,
-                ChatMemberStatus.MEMBER,
-            ):
-                print(f"[FSUB] Not a valid member in channel {channel_id}")
-                return False
+            member = await client.get_chat_member(chat_id=channel_id, user_id=user_id)
         except UserNotParticipant:
-            print(f"[FSUB] User {user_id} is not participant of channel {channel_id}")
-            return False
-        except Exception as e:
-            print(f"[FSUB] Unknown error: {e}")
             return False
 
-    print("[FSUB] All checks passed ✅")
+        if member.status not in member_status:
+            return False
+
     return True
+
 
 async def encode(string):
     string_bytes = string.encode("ascii")
