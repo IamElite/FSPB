@@ -334,12 +334,30 @@ REPLY_ERROR = """<code>Use this command as a replay to any telegram message with
 @Bot.on_message(filters.command("start") & filters.private)
 async def not_joined(client: Client, message: Message):
     buttons = []
+    user_id = message.from_user.id
+
+    temp_row = []
     for i, ch in enumerate(FORCE_SUB_CHANNELS):
         try:
-            invite = await client.export_chat_invite_link(ch)
-            buttons.append([InlineKeyboardButton(f"📍 Join Channel {i+1} 📍", url=invite)])
+            # Check if user already used an old invite for this channel
+            if is_reuse_invalid(user_id, ch):
+                url = "https://t.me/invalid_link_placeholder"  # dummy
+                text = "This invite link is invalid or has expired."
+            else:
+                url = await client.export_chat_invite_link(ch)
+                text = f"📍 Join {i+1} 📍"
+                store_invite_time(user_id, ch)
+
+            temp_row.append(InlineKeyboardButton(text, url=url))
+            if len(temp_row) == 2:
+                buttons.append(temp_row)
+                temp_row = []
+
         except Exception as e:
             print(f"Invite link fetch error for {ch}: {e}")
+
+    if temp_row:
+        buttons.append(temp_row)
 
     if not buttons:
         return await message.reply("❌ Bot not admin in channels or links failed.")
@@ -365,7 +383,6 @@ async def not_joined(client: Client, message: Message):
         reply_markup=InlineKeyboardMarkup(buttons),
         quote=True
     )
-
 
 
 @Bot.on_message(filters.command('users') & filters.private & filters.user(ADMINS))
