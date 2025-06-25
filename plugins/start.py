@@ -383,12 +383,33 @@ REPLY_ERROR = """<code>Use this command as a replay to any telegram message with
     
 @Bot.on_message(filters.command('start') & filters.private)
 async def not_joined(client: Client, message: Message):
-    # Ensure invite links are available
-    links = list(getattr(client, 'invitelinks', {}).values())
+    # Try to get invite links from FORCE_SUB_CHANNELS if available
     join_buttons = []
+    links = []
+    try:
+        # Try to use FORCE_SUB_CHANNELS from config
+        for channel in FORCE_SUB_CHANNELS:
+            try:
+                chat = await client.get_chat(channel)
+                # Try to get an existing invite link or create a new one
+                invite = None
+                if hasattr(client, 'invitelinks') and channel in client.invitelinks:
+                    invite = client.invitelinks[channel]
+                else:
+                    # Try to create a new invite link (requires admin rights)
+                    invite_obj = await client.create_chat_invite_link(chat.id, creates_join_request=False)
+                    invite = invite_obj.invite_link
+                if invite:
+                    links.append(invite)
+            except Exception as e:
+                continue  # Skip channels where invite can't be fetched
+    except Exception as e:
+        pass
+    # Fallback to client.invitelinks if nothing found
+    if not links and hasattr(client, 'invitelinks'):
+        links = list(client.invitelinks.values())
     if not links:
-        # No channels configured, inform the user
-        await message.reply_text("No channels to join. Please contact the admin.")
+        await message.reply_text("Bot is not admin in any force subscribe channel or no channels configured. Please contact admin.")
         return
     # Create 2x2 grid of join buttons
     for i in range(0, len(links), 2):
@@ -396,7 +417,7 @@ async def not_joined(client: Client, message: Message):
         for link in links[i:i+2]:
             row.append(InlineKeyboardButton(text="📍 Jᴏɪɴ Cʜᴀɴɴᴇʟ 📍", url=link))
         join_buttons.append(row)
-    # Add Try Again button (always present, handles missing argument)
+    # Add Try Again button
     start_arg = message.command[1] if len(message.command) > 1 else ''
     try_again_url = f"https://t.me/{getattr(client, 'username', 'BotUsername')}?start={start_arg}"
     join_buttons.append([
@@ -416,7 +437,6 @@ async def not_joined(client: Client, message: Message):
         ),
         reply_markup=InlineKeyboardMarkup(join_buttons)
     )
-
 
 
 
