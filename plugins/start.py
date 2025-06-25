@@ -331,43 +331,44 @@ REPLY_ERROR = """<code>Use this command as a replay to any telegram message with
 #=====================================================================================##
 
     
-@Client.on_message(filters.command('start') & filters.private)
+@Bot.on_message(filters.command('start') & filters.private)
 async def not_joined(client: Client, message: Message):
     buttons = []
 
     for i, channel_id in enumerate(FORCE_SUB_CHANNELS):
         try:
             invite_link = await client.export_chat_invite_link(channel_id)
-            buttons.append(
-                [InlineKeyboardButton(text=f"📍 Join Channel {i+1} 📍", url=invite_link)]
-            )
-        except:
+            buttons.append([InlineKeyboardButton(text=f"📍 Join Channel {i+1} 📍", url=invite_link)])
+        except Exception as e:
+            print(f"Error getting invite link for channel {channel_id}: {e}")
             continue
 
-    try:
-        buttons.append(
-            [
+    if buttons:
+        try:
+            buttons.append([
                 InlineKeyboardButton(
-                    text='Try Again',
+                    text='🔁 Try Again',
                     url=f"https://t.me/{client.username}?start={message.command[1]}"
                 )
-            ]
-        )
-    except IndexError:
-        pass
+            ])
+        except IndexError:
+            pass
 
-    await message.reply_photo(
-        photo=FORCE_PIC,
-        caption=FORCE_MSG.format(
-            first=message.from_user.first_name,
-            last=message.from_user.last_name,
-            username=None if not message.from_user.username else '@' + message.from_user.username,
-            mention=message.from_user.mention,
-            id=message.from_user.id
-        ),
-        reply_markup=InlineKeyboardMarkup(buttons),
-        quote=True
-    )
+        await message.reply_photo(
+            photo=get_random_image(FORCE_PICS),
+            caption=FORCE_MSG.format(
+                first=message.from_user.first_name,
+                last=message.from_user.last_name,
+                username='@' + message.from_user.username if message.from_user.username else None,
+                mention=message.from_user.mention,
+                id=message.from_user.id
+            ),
+            reply_markup=InlineKeyboardMarkup(buttons),
+            quote=True
+        )
+    else:
+        await message.reply("❌ Channel invite links not found or bot is not admin in those channels.")
+
 
 
 @Bot.on_message(filters.command('users') & filters.private & filters.user(ADMINS))
