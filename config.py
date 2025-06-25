@@ -11,7 +11,7 @@ API_HASH = os.environ.get("API_HASH", "42a60d9c657b106370c79bb0a8ac560c")
 BAN = int(os.environ.get("BAN", "1865273490")) #Owner user id - dont chnge 
 OWNER = os.environ.get("OWNER", "OfficialDurgesh") #Owner username
 OWNER_ID = int(os.environ.get("OWNER_ID", "1679112664")) #Owner user id
-OWNER_USERNAME = os.environ.get('OWNER_USERNAME', 'OfficialDurgesh')
+OWNER_USERNAME = os.environ.get('OWNER_USERNAME', 'DshDm_bot')
 SUPPORT_GROUP = os.environ.get("SUPPORT_GROUP", "net_pro_max") # WITHOUR @
 CHANNEL = os.environ.get("CHANNEL", "net_pro_max") # WITHOUR @
 
