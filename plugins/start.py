@@ -382,60 +382,57 @@ REPLY_ERROR = """<code>Use this command as a replay to any telegram message with
     
 @Bot.on_message(filters.command('start') & filters.private)
 async def not_joined(client: Client, message: Message):
-    # Try to get invite links from FORCE_SUB_CHANNELS if available
-    join_buttons = []
-    links = []
-    try:
-        # Try to use FORCE_SUB_CHANNELS from config
+    # Check subscription status
+    if FORCE_SUB_CHANNELS and not await is_subscribed(None, client, message):
+        join_buttons = []
+        links = []
+        
+        # Generate invite links
         for channel in FORCE_SUB_CHANNELS:
             try:
                 chat = await client.get_chat(channel)
-                # Try to get an existing invite link or create a new one
-                invite = None
-                if hasattr(client, 'invitelinks') and channel in client.invitelinks:
-                    invite = client.invitelinks[channel]
-                else:
-                    # Try to create a new invite link (requires admin rights)
-                    invite_obj = await client.create_chat_invite_link(chat.id, creates_join_request=False)
-                    invite = invite_obj.invite_link
-                if invite:
-                    links.append(invite)
+                try:
+                    invite = await client.create_chat_invite_link(
+                        chat_id=channel,
+                        creates_join_request=False
+                    )
+                    links.append(invite.invite_link)
+                except:
+                    if chat.username:
+                        links.append(f"https://t.me/{chat.username}")
             except Exception as e:
-                continue  # Skip channels where invite can't be fetched
-    except Exception as e:
-        pass
-    # Fallback to client.invitelinks if nothing found
-    if not links and hasattr(client, 'invitelinks'):
-        links = list(client.invitelinks.values())
-    if not links:
-        await message.reply_text("Bot is not admin in any force subscribe channel or no channels configured. Please contact admin.")
-        return
-    # Create 2x2 grid of join buttons
-    for i in range(0, len(links), 2):
-        row = []
-        for link in links[i:i+2]:
-            row.append(InlineKeyboardButton(text="📍 Jᴏɪɴ Cʜᴀɴɴᴇʟ 📍", url=link))
-        join_buttons.append(row)
-    # Add Try Again button
-    start_arg = message.command[1] if len(message.command) > 1 else ''
-    try_again_url = f"https://t.me/{getattr(client, 'username', 'BotUsername')}?start={start_arg}"
-    join_buttons.append([
-        InlineKeyboardButton(
-            text='Try Again',
-            url=try_again_url
-        )
-    ])
-    await message.reply_photo(
-        photo=get_random_image(FORCE_PICS),
-        caption=FORCE_MSG.format(
-            first=message.from_user.first_name,
-            last=message.from_user.last_name,
-            username=None if not message.from_user.username else '@' + message.from_user.username,
-            mention=message.from_user.mention,
-            id=message.from_user.id
-        ),
-        reply_markup=InlineKeyboardMarkup(join_buttons)
-    )
+                print(f"Error getting chat: {e}")
+                continue
+        
+        if not links:
+            return await message.reply_text("❌ Bot configuration error. Contact admin.")
+        
+        # Create buttons (2 per row)
+        for i in range(0, len(links), 2):
+            join_buttons.append([
+                InlineKeyboardButton("📍 Join Channel 📍", url=links[i]),
+                *[InlineKeyboardButton("📍 Join Channel 📍", url=links[i+1]) 
+                  if i+1 < len(links) else None]
+            ])
+        
+        # Add Try Again button
+        join_buttons.append([
+            InlineKeyboardButton('🔄 Try Again', 
+            url=f"https://t.me/{client.me.username}?start=start")
+        ])
+        
+        # Send message with photo or text fallback
+        try:
+            await message.reply_photo(
+                photo=get_random_image(FORCE_PICS),
+                caption="Please join our channels to use this bot",
+                reply_markup=InlineKeyboardMarkup(join_buttons)
+            )
+        except:
+            await message.reply_text(
+                text="Please join our channels to use this bot",
+                reply_markup=InlineKeyboardMarkup(join_buttons)
+            )
 
 
 
