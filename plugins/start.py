@@ -244,9 +244,11 @@ async def start_command(client: Client, message):
                 [InlineKeyboardButton("✨ Premium", callback_data="upi_info")]
             ]
 
-            verification_message = await message.reply(
-                caption if hasattr(message, 'reply_photo') else caption,
+            verification_message = await message.reply_photo(
+                photo=po,
+                caption=caption,
                 reply_markup=InlineKeyboardMarkup(buttons),
+                #protect_content=PROTECT_CONTENT,
                 quote=True
             )
             return  # End execution for non-premium users
