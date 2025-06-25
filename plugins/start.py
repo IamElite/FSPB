@@ -366,7 +366,7 @@ async def not_joined(client: Client, message: Message):
     buttons.append(try_again_button)
 
     await message.reply_photo(
-        photo=get_random_image(FORCE_PIC),
+        photo=get_random_image(FORCE_PICS),
         caption=FORCE_MSG.format(
             first=message.from_user.first_name,
             last=message.from_user.last_name,
