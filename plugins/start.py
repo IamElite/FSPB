@@ -231,7 +231,7 @@ async def start_command(client: Client, message):
 
                 caption = SHORTCAP  # Use default caption for non-premium users
                 button_text = "Short Link"
-                po = get_random_image(TOKEN_PICS)
+                #po = get_random_image(TOKEN_PICS)
 
             if not short_link:
                 await message.reply("Failed to generate a short link.\ncontact admin @Professor2547 ")
