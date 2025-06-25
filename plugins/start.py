@@ -245,7 +245,7 @@ async def start_command(client: Client, message):
             ]
 
             verification_message = await message.reply_photo(
-                photo=po,
+                #photo=po,
                 caption=caption,
                 reply_markup=InlineKeyboardMarkup(buttons),
                 #protect_content=PROTECT_CONTENT,
