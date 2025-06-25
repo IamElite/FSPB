@@ -46,9 +46,9 @@ DB_DELETE = os.environ.get("DB_DELETE", "del11")
 DB_SHORT = os.environ.get("DB_SHORT", "short11")
 
 CHANNEL_ID = int(os.environ.get("CHANNEL_ID", "-1002611158964")) #database save channel id 
+
 # Format: space-separated channel IDs, e.g., "-1002583429026 -1002554824067"
-FORCE_SUB_CHANNELS = [int(channel_id) for channel_id in os.environ.get("FORCE_SUB_CHANNELS", "").split() 
-                     if channel_id.strip() and channel_id != "0"]
+FORCE_SUB_CHANNELS = [int(cid) for cid in os.environ.get("FORCE_SUB_CHANNELS", "").split() if cid.strip() and cid != "0"]
 
 #Shortner (token system) 
 SHORTLINK_URL = os.environ.get("SHORTLINK_URL", "shrinkforearn.in") 
