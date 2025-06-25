@@ -339,7 +339,7 @@ async def not_joined(client: Client, message: Message):
     for i, ch in enumerate(FORCE_SUB_CHANNELS):
         try:
             url = await client.export_chat_invite_link(ch)
-            row.append(InlineKeyboardButton(f"📍 Join Fast{i+1} 📍", url=url))
+            row.append(InlineKeyboardButton(f"📍 Join Fast {i+1} 📍", url=url))
             if len(row) == 2:
                 buttons.append(row)
                 row = []
