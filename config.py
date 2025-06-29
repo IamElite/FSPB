@@ -57,7 +57,7 @@ VERIFY_EXPIRE = int(os.environ.get('VERIFY_EXPIRE', 43200)) # Add time in second
 IS_VERIFY = os.environ.get("IS_VERIFY", "True")
 TUT_VID = os.environ.get("TUT_VID", "https://t.me/Phdlust_Premium_Proof/12")
 
-SHORTCAP = "ᴛσᴛᴧʟ ᴄʟɪᴄᴋꜱ: {clicks}, 🔗 ꜱɪʀ ʏσᴜʀ ʟɪηᴋ’ꜱ ʀєᴧᴅʏ 👇" #token caption
+SHORTCAP = "<b>ᴛσᴛᴧʟ ᴄʟɪᴄᴋꜱ: {clicks}, 🔗 ꜱɪʀ ʏσᴜʀ ʟɪηᴋ’ꜱ ʀєᴧᴅʏ 👇</b>" #token caption
 
 # ignore this one
 SECONDS = int(os.getenv("SECONDS", "200")) # auto delete in seconds
