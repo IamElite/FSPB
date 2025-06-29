@@ -39,6 +39,18 @@ def shorten_url_tinyurl(url):
     response = requests.get(api_url)
     return response.text
 
+# Add this function to increment and fetch clicks
+async def increment_and_get_clicks(link_id):
+    result = url_shorteners.find_one_and_update(
+        {"_id": link_id},
+        {"$inc": {"clicks": 1}},
+        return_document=True
+    )
+    return result.get("clicks", 1) if result else 1
+
+
+#-------------------------------fetch------------------------------
+
 # Fetch URL shortener configuration
 async def get_url_shortener_config(shortener_id):
     """Fetch URL shortener configuration from the database."""
@@ -223,7 +235,8 @@ async def start_command(client: Client, message):
                     await message.reply("Failed to generate a short link. Please try again later.\nContact admin @Professor2547")
                     return
 
-                caption = SHORTCAP  # Use default caption for non-premium users
+                clicks = await increment_and_get_clicks(phdlust_magic)  # Use the correct link ID
+                caption = f"Clicks: {clicks}, 🔗 Your link’s ready 👇"  # Use default caption for non-premium users
                 button_text = "Short Link"
                 po = get_random_image(TOKEN_PICS)
 
