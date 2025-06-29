@@ -1,6 +1,13 @@
 # line number 160-169 check for changes - token
 from pymongo import MongoClient
-import asyncio, base64, logging, os, random, re, string, time, requests
+import asyncio
+import base64
+import logging
+import os
+import random
+import re
+import string
+import time
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from datetime import datetime, timedelta
 from pyrogram import Client, filters, __version__
@@ -13,8 +20,6 @@ from config import *
 from helper_func import *
 from database.database import *
 from shortzy import Shortzy
-from img import FORCE_PICS, START_PICS, TOKEN_PICS, PRM_PICS, get_random_image
-from database.utils import start_premium_reminder_scheduler
 
 #delete_after = 600
 
@@ -27,13 +32,6 @@ url_shorteners = db[DB_SHORT]  # Collection for URL shortener configurations
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
-
-
-
-def shorten_url_tinyurl(url):
-    api_url = f"http://tinyurl.com/api-create.php?url={url}"
-    response = requests.get(api_url)
-    return response.text
 
 # Fetch URL shortener configuration
 async def get_url_shortener_config(shortener_id):
@@ -168,6 +166,11 @@ async def delete_notification_after_delay(client, chat_id, message_id, delay):
         print(f"Error deleting notification {message_id} in chat {chat_id}: {e}")
 
 
+'''
+temp_msg = await message.reply("Please wait...")
+'''
+
+        
 @Client.on_message(filters.command("start") & filters.private & subscribed)
 async def start_command(client: Client, message):
     user_id = message.from_user.id
@@ -194,6 +197,15 @@ async def start_command(client: Client, message):
             except Exception as e:
                 await message.reply_text("Invalid link provided. \n\nGet help /upi")
                 return
+        """
+        if "vip-" in decoded_string:
+            if not premium_status:
+                sent_message = await message.reply_text(
+                    "This VIP content is only accessible to premium (VIP) users! \n\nUpgrade to VIP to access. \nClick here /myplan"
+                )
+                #asyncio.create_task(schedule_auto_delete(client, sent_message.chat.id, sent_message.id, delay=600))
+                return 
+        """
 
         if "vip-" in decoded_string: # and not premium_status:
             normal_link = decoded_string.replace("vip-", "get-")
@@ -205,7 +217,7 @@ async def start_command(client: Client, message):
                 short_link = linkb
                 caption = "🔰 Yᴏᴜ Aʀᴇ Pʀᴇᴍɪᴜᴍ Uꜱᴇʀ ✅\nCʟɪᴄᴋ Bᴇʟᴏᴡ Bᴜᴛᴛᴏɴ Tᴏ Wᴀᴛᴄʜ Dɪʀᴇᴄᴛʟʏ"
                 button_text = "Cʟɪᴄᴋ Tᴏ Wᴀᴛᴄʜ"
-                po = get_random_image(PRM_PICS)
+                po = PRM_PIC
             else:
                 # Generate a shortened link for non-premium users
                 shortener_ids = ["myshortener1", "myshortener2", "myshortener3"]
@@ -213,14 +225,13 @@ async def start_command(client: Client, message):
                 
                 try:
                     short_link = await get_shortlink(phdlust_magic, linkb)
-                    short_link = shorten_url_tinyurl(short_link)
-                except Exception:
+                except ValueError:
                     await message.reply("Failed to generate a short link. Please try again later.\nContact admin @Professor2547")
                     return
 
                 caption = SHORTCAP  # Use default caption for non-premium users
                 button_text = "Short Link"
-                po = get_random_image(TOKEN_PICS)
+                po = TOKEN_PIC
 
             if not short_link:
                 await message.reply("Failed to generate a short link.\ncontact admin @Professor2547 ")
@@ -233,12 +244,21 @@ async def start_command(client: Client, message):
                 [InlineKeyboardButton("✨ Premium", callback_data="upi_info")]
             ]
 
-            verification_message = await message.reply(
-                caption if hasattr(message, 'reply_photo') else caption,
+            verification_message = await message.reply_photo(
+                photo=po,
+                caption=caption,
                 reply_markup=InlineKeyboardMarkup(buttons),
+                #protect_content=PROTECT_CONTENT,
                 quote=True
             )
             return  # End execution for non-premium users
+
+        """
+        if is_premium_link and not premium_status:
+            sent_message = await message.reply_text("This link is for premium users only! \n\nUpgrade to access. \nClick here /myplan")
+            #asyncio.create_task(schedule_auto_delete(client, sent_message.chat.id, sent_message.id, delay=600))
+            return
+        """
 
         argument = decoded_string.split("-")
         ids = []
@@ -298,6 +318,34 @@ async def start_command(client: Client, message):
             delete_notification = await message.reply(NOTIFICATION)
             asyncio.create_task(delete_notification_after_delay(client, delete_notification.chat.id, delete_notification.id, delay=NOTIFICATION_TIME))
 
+        # try:
+        #     messages = await get_messages(client, ids)
+
+        #     for msg in messages:
+        #         if bool(CUSTOM_CAPTION) & bool(msg.document):
+        #             caption = CUSTOM_CAPTION.format(previouscaption = "" if not msg.caption else msg.caption.html, filename = msg.document.file_name)
+        #         else:
+        #             caption = "" if not msg.caption else msg.caption.html
+    
+        #         if DISABLE_CHANNEL_BUTTON:
+        #             reply_markup = msg.reply_markup
+        #         else:
+        #             reply_markup = None
+        #         sent_message = await msg.copy(chat_id=message.from_user.id, protect_content=True, caption=caption, reply_markup=reply_markup)
+        #         if AUTO_DELETE == True:
+        #             asyncio.create_task(schedule_auto_delete(client, sent_message.chat.id, sent_message.id, delay=DELETE_AFTER))
+        #         await sleep(0.5)
+                
+        #     if GET_AGAIN == True:
+        #         get_file_markup = InlineKeyboardMarkup([
+        #             [InlineKeyboardButton("GET FILE AGAIN", url=f"https://t.me/{client.username}?start={message.text.split()[1]}")]
+        #         ])
+        #         await message.reply(GET_INFORM, reply_markup=get_file_markup)
+ 
+        # except Exception as e:
+        #     logger.error(f"Error fetching messages: {e}")
+        # finally:
+        #     await temp_msg.delete()
     else:
         reply_markup = InlineKeyboardMarkup(
             [
@@ -307,7 +355,7 @@ async def start_command(client: Client, message):
         )
         
         sent_message = await message.reply_photo(
-            photo=get_random_image(START_PICS),
+            photo=START_PIC,
             caption=START_MSG.format(
                     first=message.from_user.first_name,
                     last=message.from_user.last_name,
@@ -333,39 +381,42 @@ REPLY_ERROR = """<code>Use this command as a replay to any telegram message with
 #=====================================================================================##
 
     
-@Bot.on_message(filters.command("start") & filters.private)
+@Bot.on_message(filters.command('start') & filters.private)
 async def not_joined(client: Client, message: Message):
-    user_id = message.from_user.id
-    buttons, row = [], []
-
-    for i, ch in enumerate(FORCE_SUB_CHANNELS):
-        try:
-            url = await client.export_chat_invite_link(ch)
-            row.append(InlineKeyboardButton(f"📍 Join Fast {i+1} 📍", url=url))
-            if len(row) == 2:
-                buttons.append(row)
-                row = []
-        except: pass
-
-    if row: buttons.append(row)
-
-    try_again = []
-    if len(message.command) > 1:
-        try_again = [InlineKeyboardButton("🔁 Try Again", url=f"https://t.me/{client.username}?start={message.command[1]}")]
-
-    if try_again: buttons.append(try_again)
+    buttons = [
+        [
+            InlineKeyboardButton(text="📍 Jᴏɪɴ Cʜᴀɴɴᴇʟ 📍", url=client.invitelink),
+            InlineKeyboardButton(text="📍 Jᴏɪɴ Cʜᴀɴɴᴇʟ 📍", url=client.invitelink2),
+        ],
+        [
+            InlineKeyboardButton(text="📍 Jᴏɪɴ Cʜᴀɴɴᴇʟ 📍", url=client.invitelink3),
+            InlineKeyboardButton(text="📍 Jᴏɪɴ Cʜᴀɴɴᴇʟ 📍", url=client.invitelink4),
+        ]
+    ]
+    try:
+        buttons.append(
+            [
+                InlineKeyboardButton(
+                    text = 'Try Again',
+                    url = f"https://t.me/{client.username}?start={message.command[1]}"
+                )
+            ]
+        )
+    except IndexError:
+        pass
 
     await message.reply_photo(
-        photo=get_random_image(FORCE_PICS),
+        photo=FORCE_PIC,  # This can be a URL or a file path
         caption=FORCE_MSG.format(
-            first=message.from_user.first_name,
-            last=message.from_user.last_name,
-            username=("@" + message.from_user.username) if message.from_user.username else None,
-            mention=message.from_user.mention,
-            id=message.from_user.id
-        ),
-        reply_markup=InlineKeyboardMarkup(buttons),
-        quote=True
+                first = message.from_user.first_name,
+                last = message.from_user.last_name,
+                username = None if not message.from_user.username else '@' + message.from_user.username,
+                mention = message.from_user.mention,
+                id = message.from_user.id
+            ),
+        reply_markup = InlineKeyboardMarkup(buttons),
+        quote = True,
+        #disable_web_page_preview = True
     )
 
 
@@ -421,16 +472,70 @@ Unsuccessful: <code>{unsuccessful}</code></b>"""
         msg = await message.reply(REPLY_ERROR)
         await asyncio.sleep(8)
         await msg.delete()
+'''
+# Add /addpr command for admins to add premium subscription
+@Bot.on_message(filters.command('addpr') & filters.private)
+async def add_premium(client: Client, message: Message):
+    if message.from_user.id != ADMINS:
+        return await message.reply("You don't have permission to add premium users.")
 
-# At the end of the file or after Bot is initialized, start the scheduler
-# (Make sure to pass both bot_instance and phdlust)
-import asyncio
-from bot import Bot
+    try:
+        command_parts = message.text.split()
+        target_user_id = int(command_parts[1])
+        duration_in_days = int(command_parts[2])
+        await add_premium_user(target_user_id, duration_in_days)
+        await message.reply(f"User {target_user_id} added to premium for {duration_in_days} days.")
+    except Exception as e:
+        await message.reply(f"Error: {str(e)}")
 
-bot_instance = Bot()
+# Add /removepr command for admins to remove premium subscription
+@Bot.on_message(filters.command('removepr') & filters.private)
+async def remove_premium(client: Client, message: Message):
+    if message.from_user.id != ADMINS:
+        return await message.reply("You don't have permission to remove premium users.")
 
-async def on_startup():
-    start_premium_reminder_scheduler(bot_instance, phdlust)
+    try:
+        command_parts = message.text.split()
+        target_user_id = int(command_parts[1])
+        await remove_premium_user(target_user_id)
+        await message.reply(f"User {target_user_id} removed from premium.")
+    except Exception as e:
+        await message.reply(f"Error: {str(e)}")
 
-asyncio.get_event_loop().create_task(on_startup())
+# Add /myplan command for users to check their premium subscription status
+@Bot.on_message(filters.command('myplan') & filters.private)
+async def my_plan(client: Client, message: Message):
+    is_premium, expiry_time = await get_user_subscription(message.from_user.id)
+    if is_premium:
+        time_left = expiry_time - time.time()
+        days_left = int(time_left / 86400)
+        await message.reply(f"Your premium subscription is active. Time left: {days_left} days.")
+    else:
+        await message.reply("You are not a premium user.")
 
+# Add /plans command to show available subscription plans
+@Bot.on_message(filters.command('plans') & filters.private)
+async def show_plans(client: Client, message: Message):
+    plans_text = """
+Available Subscription Plans:
+
+1. 7 Days Premium - $5
+2. 30 Days Premium - $15
+3. 90 Days Premium - $35
+
+Use /upi to make the payment.
+"""
+    await message.reply(plans_text)
+
+# Add /upi command to provide UPI payment details
+@Bot.on_message(filters.command('upi') & filters.private)
+async def upi_info(client: Client, message: Message):
+    upi_text = """
+To subscribe to premium, please make the payment via UPI.
+
+UPI ID: your-upi-id@bank
+
+After payment, contact the bot admin to activate your premium subscription.
+"""
+    await message.reply(upi_text)
+'''
