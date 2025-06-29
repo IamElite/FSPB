@@ -29,11 +29,6 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-def shorten_url_isgd(url):
-    api_url = f"https://is.gd/create.php?format=simple&url={url}"
-    response = requests.get(api_url)
-    return response.text
-
 def shorten_url_clckru(url):
     api_url = f"https://clck.ru/--?url={url}"
     response = requests.get(api_url)
@@ -208,7 +203,7 @@ async def start_command(client: Client, message):
             normal_link = decoded_string.replace("vip-", "get-")
             phdlust = await encode(normal_link)
             linkb = f"https://t.me/{client.username}?start={phdlust}"
-            linkb = shorten_url_isgd(linkb)
+            linkb = shorten_url_tinyurl(linkb)
 
             if await is_premium_user(user_id):
                 # Provide direct link for premium users
