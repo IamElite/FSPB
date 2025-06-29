@@ -1,7 +1,4 @@
-import asyncio
-import time
-from start import phdlust
-
+import asyncio, time
 
 async def send_premium_reminders(bot_instance, phdlust):
     while True:
