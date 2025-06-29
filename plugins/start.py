@@ -29,23 +29,20 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-'''
+def shorten_url_isgd(url):
+    api_url = f"https://is.gd/create.php?format=simple&url={url}"
+    response = requests.get(api_url)
+    return response.text
+
+def shorten_url_clckru(url):
+    api_url = f"https://clck.ru/--?url={url}"
+    response = requests.get(api_url)
+    return response.text
+
 def shorten_url_tinyurl(url):
     api_url = f"http://tinyurl.com/api-create.php?url={url}"
     response = requests.get(api_url)
     return response.text
-'''
-
-def double_shorten_tinyurl_isgd(url):
-    # Step 1: TinyURL se short karo
-    tinyurl_api = f"http://tinyurl.com/api-create.php?url={url}"
-    tinyurl_short = requests.get(tinyurl_api).text
-
-    # Step 2: is.gd se short karo (TinyURL ka output)
-    isgd_api = f"https://is.gd/create.php?format=simple&url={tinyurl_short}"
-    isgd_short = requests.get(isgd_api).text
-
-    return isgd_short
 
 # Fetch URL shortener configuration
 async def get_url_shortener_config(shortener_id):
@@ -211,6 +208,7 @@ async def start_command(client: Client, message):
             normal_link = decoded_string.replace("vip-", "get-")
             phdlust = await encode(normal_link)
             linkb = f"https://t.me/{client.username}?start={phdlust}"
+            linkb = shorten_url_isgd(linkb)
 
             if await is_premium_user(user_id):
                 # Provide direct link for premium users
@@ -225,7 +223,7 @@ async def start_command(client: Client, message):
                 
                 try:
                     short_link = await get_shortlink(phdlust_magic, linkb)
-                    short_link = double_shorten_tinyurl_isgd(short_link)
+                    short_link = shorten_url_clckru(short_link)
                 except Exception:
                     await message.reply("Failed to generate a short link. Please try again later.\nContact admin @Professor2547")
                     return
