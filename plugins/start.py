@@ -236,7 +236,7 @@ async def start_command(client: Client, message):
                     return
 
                 clicks = await increment_and_get_clicks(phdlust_magic)  # Use the correct link ID
-                caption = SHORTCAP  # Use default caption for non-premium users
+                caption = SHORTCAP.format(clicks=clicks)  # Use default caption for non-premium users
                 button_text = "Short Link"
                 po = get_random_image(TOKEN_PICS)
 
