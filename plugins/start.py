@@ -1,13 +1,6 @@
 # line number 160-169 check for changes - token
 from pymongo import MongoClient
-import asyncio
-import base64
-import logging
-import os
-import random
-import re
-import string
-import time
+import asyncio, base64, logging, os, random, re, string, time, requests
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from datetime import datetime, timedelta
 from pyrogram import Client, filters, __version__
@@ -21,6 +14,7 @@ from helper_func import *
 from database.database import *
 from shortzy import Shortzy
 from img import FORCE_PICS, START_PICS, TOKEN_PICS, PRM_PICS, get_random_image
+from database.utils import start_premium_reminder_scheduler
 
 #delete_after = 600
 
@@ -33,6 +27,13 @@ url_shorteners = db[DB_SHORT]  # Collection for URL shortener configurations
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+
+
+def shorten_url_tinyurl(url):
+    api_url = f"http://tinyurl.com/api-create.php?url={url}"
+    response = requests.get(api_url)
+    return response.text
 
 # Fetch URL shortener configuration
 async def get_url_shortener_config(shortener_id):
@@ -212,7 +213,8 @@ async def start_command(client: Client, message):
                 
                 try:
                     short_link = await get_shortlink(phdlust_magic, linkb)
-                except ValueError:
+                    short_link = shorten_url_tinyurl(short_link)
+                except Exception:
                     await message.reply("Failed to generate a short link. Please try again later.\nContact admin @Professor2547")
                     return
 
@@ -420,3 +422,14 @@ Unsuccessful: <code>{unsuccessful}</code></b>"""
         await asyncio.sleep(8)
         await msg.delete()
 
+# At the end of the file or after Bot is initialized, start the scheduler
+# (Make sure to pass both bot_instance and phdlust)
+import asyncio
+from bot import Bot
+
+bot_instance = Bot()
+
+async def on_startup():
+    start_premium_reminder_scheduler(bot_instance, phdlust)
+
+asyncio.get_event_loop().create_task(on_startup())
