@@ -236,9 +236,9 @@ async def start_command(client: Client, message):
                     return
 
                 clicks = await increment_and_get_clicks(phdlust_magic)  # Use the correct link ID
-                caption = SHORTCAP.format(clicks=clicks) # Use default caption for non-premium users
-                button_text = "∙ ꜱʜσʀᴛ ʟɪηᴋ ∙"
-                po = get_random_image(TOKEN_PICS)
+                caption = SHORTCAP.format(clicks=clicks)
+                BUTTON = "∙ ꜱʜσʀᴛ ʟɪηᴋ ∙" # Use default caption for non-premium users# Use default caption for non-premium users
+                button_text = BUTTON
 
             if not short_link:
                 await message.reply("Failed to generate a short link.\ncontact admin @Professor2547 ")
