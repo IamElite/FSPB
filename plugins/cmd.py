@@ -11,6 +11,12 @@ import time
 # /help command to show available commands
 @Bot.on_message(filters.private & filters.command('help') & filters.user(ADMINS))
 async def help_command(bot: Bot, message: Message):
+    user_id = message.from_user.id
+
+    if user_id not in ADMINS:
+        await message.reply("Only Owner can use this command.")
+        return
+
     help_text = """
 📖 <b>Available Commands:</b>
 
@@ -30,14 +36,21 @@ async def help_command(bot: Bot, message: Message):
 
 /addshort - adds a new shortener configuration to MongoDB.
 /resetshort - displays a list of available shorteners, which can be reset based on user interaction.
+/settime or /st - Set shortener limit (Admins only).
+
+<b>Note:</b> Commands marked with "(Admins only)" can only be used by bot owners.
 """
     await message.reply(help_text, parse_mode=ParseMode.HTML)
 
 
-# Command handler for /settime or /st
-@Bot.on_message(filters.private & filters.command(["settime", "st"]) & filters.user(ADMINS))
+## Command handler for /settime or /st
+@Bot.on_message(filters.private & filters.command(["settime", "st"]))
 async def set_short_limit_command(client, message):
     user_id = message.from_user.id
+    if user_id not in ADMINS:
+        await message.reply("Only Owner can use this command.")
+        return
+    
     try:
         if len(message.command) > 1:
             limit = int(message.command[1])
