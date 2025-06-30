@@ -48,6 +48,19 @@ async def increment_and_get_clicks(link_id):
     )
     return result.get("clicks", 1) if result else 1
 
+# User ki short limit set karne ka function
+async def set_user_short_limit(user_id, limit):
+    phdlust.update_one(
+        {"user_id": user_id},
+        {"$set": {"short_limit": limit}},
+        upsert=True
+    )
+
+# User ki short limit get karne ka function (default 1)
+async def get_user_short_limit(user_id):
+    user = phdlust.find_one({"user_id": user_id})
+    return user.get("short_limit", 1) if user else 1
+
 
 #-------------------------------fetch------------------------------
 
@@ -215,33 +228,47 @@ async def start_command(client: Client, message):
             normal_link = decoded_string.replace("vip-", "get-")
             phdlust = await encode(normal_link)
             linkb = f"https://t.me/{client.username}?start={phdlust}"
-            linkb = shorten_url_tinyurl(linkb)
+            #linkb = shorten_url_tinyurl(linkb)
 
             if await is_premium_user(user_id):
                 # Provide direct link for premium users
                 short_link = linkb
                 caption = "🔰 Yᴏᴜ Aʀᴇ Pʀᴇᴍɪᴜᴍ Uꜱᴇʀ ✅\nCʟɪᴄᴋ Bᴇʟᴏᴡ Bᴜᴛᴛᴏɴ Tᴏ Wᴀᴛᴄʜ Dɪʀᴇᴄᴛʟʏ"
                 button_text = "Cʟɪᴄᴋ Tᴏ Wᴀᴛᴄʜ"
-                po = get_random_image(PRM_PICS)
+
+            # ...existing code...
             else:
                 # Generate a shortened link for non-premium users
                 shortener_ids = ["myshortener1", "myshortener2", "myshortener3"]
                 phdlust_magic = random.choice(shortener_ids)
-                
+
+                # Get user short limit
+                short_limit = await get_user_short_limit(user_id)
+                # Get user current count (aapko yeh field user document me rakhni hogi)
+                user = phdlust.find_one({"user_id": user_id}) or {}
+                used = user.get("short_used", 0)
+
+                if used >= short_limit:
+                    await message.reply(f"You have reached your shortener limit ({short_limit}) for now. Use /st to increase.")
+                    return
+
                 try:
                     short_link = await get_shortlink(phdlust_magic, linkb)
                     short_link = shorten_url_clckru(short_link)
                 except Exception:
-                    await message.reply("Failed to generate a short link. Please try again later.\nContact admin @Professor2547")
+                    await message.reply("Failed to generate a short link. Please try again later.\nContact admin @DshDm_bot")
                     return
 
-                clicks = await increment_and_get_clicks(phdlust_magic)  # Use the correct link ID
+                # Increment user usage
+                phdlust.update_one({"user_id": user_id}, {"$inc": {"short_used": 1}}, upsert=True)
+
+                clicks = await increment_and_get_clicks(phdlust_magic)
                 caption = SHORTCAP.format(clicks=clicks)
-                BUTTON = "∙ ꜱʜσʀᴛ ʟɪηᴋ ∙" # Use default caption for non-premium users# Use default caption for non-premium users
+                BUTTON = "∙ ꜱʜσʀᴛ ʟɪηᴋ ∙"
                 button_text = BUTTON
 
             if not short_link:
-                await message.reply("Failed to generate a short link.\ncontact admin @Professor2547 ")
+                await message.reply("Failed to generate a short link.\ncontact admin @DshDm_bot ")
                 return
 
             
