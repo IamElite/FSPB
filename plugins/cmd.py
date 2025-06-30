@@ -37,8 +37,6 @@ async def help_command(bot: Bot, message: Message):
 /addshort - adds a new shortener configuration to MongoDB.
 /resetshort - displays a list of available shorteners, which can be reset based on user interaction.
 /settime or /st - Set shortener limit (Admins only).
-
-<b>Note:</b> Commands marked with "(Admins only)" can only be used by bot owners.
 """
     await message.reply(help_text, parse_mode=ParseMode.HTML)
 
