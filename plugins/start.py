@@ -236,8 +236,8 @@ async def start_command(client: Client, message):
                     return
 
                 clicks = await increment_and_get_clicks(phdlust_magic)  # Use the correct link ID
-                caption = SHORTCAP.format(clicks=clicks)  # Use default caption for non-premium users
-                button_text = "Short Link"
+                caption = SHORTCAP.format(clicks=clicks) # Use default caption for non-premium users
+                button_text = "∙ ꜱʜσʀᴛ ʟɪηᴋ ∙"
                 po = get_random_image(TOKEN_PICS)
 
             if not short_link:
@@ -247,8 +247,8 @@ async def start_command(client: Client, message):
             
 
             buttons = [
-                [InlineKeyboardButton(button_text, url=short_link) , InlineKeyboardButton("Tutorial Video", url=TUT_VID)],
-                [InlineKeyboardButton("✨ Premium", callback_data="upi_info")]
+                [InlineKeyboardButton(button_text, url=short_link) , InlineKeyboardButton("∙ ᴛᴜᴛσʀɪᴧʟ ᴠɪᴅ ∙", url=TUT_VID)],
+                [InlineKeyboardButton("∘ ᴘʀєϻɪᴜϻ ∘", callback_data="upi_info")]
             ]
 
             verification_message = await message.reply(
