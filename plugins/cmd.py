@@ -42,25 +42,21 @@ async def help_command(bot: Bot, message: Message):
 
 
 ## Command handler for /settime or /st
-@Bot.on_message(filters.private & filters.command(["settime", "st"]))
-async def set_short_limit_command(client, message):
+@Client.on_message(filters.private & filters.command(["settime", "st"]) & filters.user(ADMINS))
+async def set_short_limit(client: Client, message: Message):
     user_id = message.from_user.id
-    if user_id not in ADMINS:
-        await message.reply("Only Owner can use this command.")
+    args = message.text.split()
+    if len(args) < 2 or not args[1].isdigit():
+        await message.reply("Usage: <code>/settime 2</code> ya <code>/st 2</code>\nDefault: 1")
         return
-    
-    try:
-        if len(message.command) > 1:
-            limit = int(message.command[1])
-            if limit < 1:
-                await message.reply("Minimum value 1 allowed.")
-                return
-        else:
-            limit = 1
-        await set_user_short_limit(user_id, limit)
-        await message.reply(f"Shortener limit set to {limit} for you.")
-    except Exception as e:
-        await message.reply("Please use like: /st 2\n(Default is 1)")
+
+    limit = int(args[1])
+    if limit < 1 or limit > 10:
+        await message.reply("Limit 1 se 10 ke beech hona chahiye.")
+        return
+
+    await set_user_short_limit(user_id, limit)
+    await message.reply(f"✅ Aapki short limit ab {limit} set ho gayi hai.")
 
 
 # Command to add a premium subscription for a user (admin only)
