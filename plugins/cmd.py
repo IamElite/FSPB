@@ -9,7 +9,7 @@ from pyrogram.enums import ParseMode
 import time
 
 # /help command to show available commands
-@Bot.on_message(filters.command('help') & filters.private)
+@Bot.on_message(filters.private & filters.command('help') & filters.user(ADMINS))
 async def help_command(bot: Bot, message: Message):
     help_text = """
 📖 <b>Available Commands:</b>
@@ -32,6 +32,24 @@ async def help_command(bot: Bot, message: Message):
 /resetshort - displays a list of available shorteners, which can be reset based on user interaction.
 """
     await message.reply(help_text, parse_mode=ParseMode.HTML)
+
+
+# Command handler for /settime or /st
+@Bot.on_message(filters.private & filters.command(["settime", "st"]) & filters.user(ADMINS))
+async def set_short_limit_command(client, message):
+    user_id = message.from_user.id
+    try:
+        if len(message.command) > 1:
+            limit = int(message.command[1])
+            if limit < 1:
+                await message.reply("Minimum value 1 allowed.")
+                return
+        else:
+            limit = 1
+        await set_user_short_limit(user_id, limit)
+        await message.reply(f"Shortener limit set to {limit} for you.")
+    except Exception as e:
+        await message.reply("Please use like: /st 2\n(Default is 1)")
 
 
 # Command to add a premium subscription for a user (admin only)
