@@ -1,289 +1,474 @@
-# Import required libraries and modules
-from bot import Bot
-from pyrogram import filters
-from config import *
-from datetime import datetime
-from plugins.start import *
-from pyrogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
+# line number 160-169 check for changes - token
+from pymongo import MongoClient
+import asyncio, base64, logging, os, random, re, string, time, requests
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from datetime import datetime, timedelta
+from pyrogram import Client, filters, __version__
 from pyrogram.enums import ParseMode
-import time
+from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
+from pyrogram.errors import FloodWait, UserIsBlocked, InputUserDeactivated
 
-# /help command to show available commands
-@Bot.on_message(filters.private & filters.command('help') & filters.user(ADMINS))
-async def help_command(bot: Bot, message: Message):
-    user_id = message.from_user.id
+from bot import Bot
+from config import *
+from helper_func import *
+from database.database import *
+from shortzy import Shortzy
+from img import FORCE_PICS, START_PICS, TOKEN_PICS, PRM_PICS, get_random_image
+from database.utils import start_premium_reminder_scheduler
 
-    if user_id not in ADMINS:
-        await message.reply("Only Owner can use this command.")
-        return
+#delete_after = 600
 
-    help_text = """
-📖 <b>Available Commands:</b>
+client = MongoClient(DB_URI)  # Replace with your MongoDB URI
+db = client[DB_NAME]  # Database name
+phdlust = db["phdlust"]  # Collection for users
+phdlust_tasks = db["phdlust_tasks"] 
+deletions = db[DB_DELETE]  # Collection for scheduled deletions
+url_shorteners = db[DB_SHORT]  # Collection for URL shortener configurations
 
-/start - Start the bot and see welcome message.
-/help - Show this help message.
-/myplan - Check your premium status
-/batch - Create link for more than one posts.
-/genlink - Create link for one post.
-/stats - Check your bot uptime.
-/users - View bot statistics (Admins only).
-/broadcast - Broadcast any messages to bot users (Admins only).
-/addpr id days - Add credits to your account (Admins only).
-/removepr id - remove premium user
-/getpremiumusers - all premium user d and remaining time
-/plans - Show available premium plans.
-/upi - Show UPI payment options.
-
-/addshort - adds a new shortener configuration to MongoDB.
-/resetshort - displays a list of available shorteners, which can be reset based on user interaction.
-/settime or /st - Set shortener limit (Admins only).
-"""
-    await message.reply(help_text, parse_mode=ParseMode.HTML)
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 
-## Command handler for /settime or /st
-@Client.on_message(filters.private & filters.command(["settime", "st"]) & filters.user(ADMINS))
-async def set_short_limit(client: Client, message: Message):
-    user_id = message.from_user.id
-    args = message.text.split()
-    if len(args) < 2 or not args[1].isdigit():
-        await message.reply("Usage: <code>/settime 2</code> ya <code>/st 2</code>\nDefault: 1")
-        return
+def shorten_url_clckru(url):
+    api_url = f"https://clck.ru/--?url={url}"
+    response = requests.get(api_url)
+    return response.text
 
-    limit = int(args[1])
-    if limit < 1 or limit > 10:
-        await message.reply("Limit 1 se 10 ke beech hona chahiye.")
-        return
+def shorten_url_tinyurl(url):
+    api_url = f"http://tinyurl.com/api-create.php?url={url}"
+    response = requests.get(api_url)
+    return response.text
 
-    await set_user_short_limit(user_id, limit)
-    await message.reply(f"✅ Aapki short limit ab {limit} set ho gayi hai.")
+# Add this function to increment and fetch clicks
+async def increment_and_get_clicks(link_id):
+    result = url_shorteners.find_one_and_update(
+        {"_id": link_id},
+        {"$inc": {"clicks": 1}},
+        return_document=True
+    )
+    return result.get("clicks", 1) if result else 1
 
-
-# Command to add a premium subscription for a user (admin only)
-@Bot.on_message(filters.private & filters.command('addpr') & filters.user(ADMINS))
-async def add_premium(bot: Bot, message: Message):
-    if message.from_user.id not in ADMINS:
-        return await message.reply("You don't have permission to add premium users.")
-
-    try:
-        args = message.text.split()
-        if len(args) < 3:
-            return await message.reply("Usage: /addpr 'user_id' 'duration_in_days'")
-        
-        target_user_id = int(args[1])
-        duration_in_days = int(args[2])
-        await add_premium_user(target_user_id, duration_in_days)
-        await message.reply(f"User {target_user_id} added to premium for {duration_in_days} days.")
-    except Exception as e:
-        await message.reply(f"Error: {str(e)}")
-
-# Command to remove a premium subscription for a user (admin only)
-@Bot.on_message(filters.private & filters.command('removepr') & filters.user(ADMINS))
-async def remove_premium(bot: Bot, message: Message):
-    if message.from_user.id not in ADMINS:
-        return await message.reply("You don't have permission to remove premium users.")
-
-    try:
-        args = message.text.split()
-        if len(args) < 2:
-            return await message.reply("Usage: /removepr 'user_id'")
-        
-        target_user_id = int(args[1])
-        await remove_premium_user(target_user_id)
-        await message.reply(f"User {target_user_id} removed from premium.")
-    except Exception as e:
-        await message.reply(f"Error: {str(e)}")
-
-@Bot.on_message(filters.command('myplan') & filters.private)
-async def my_plan(bot: Bot, message: Message):
-    is_premium, expiry_time = await get_user_subscription(message.from_user.id)
-    
-    if is_premium and expiry_time:
-        time_left = int(expiry_time - time.time())
-        
-        if time_left > 0:
-            days_left = time_left // 86400
-            hours_left = (time_left % 86400) // 3600
-            minutes_left = (time_left % 3600) // 60
-
-            response_text = (
-                f"✅ Your premium subscription is active.\n\n"
-                f"🕒 Time remaining: {days_left} days, {hours_left} hours, {minutes_left} minutes."
-            )
-            
-            buttons = InlineKeyboardMarkup(
-                [
-                    [InlineKeyboardButton("Upgrade Plan", callback_data="show_plans")],
-                    [InlineKeyboardButton("🔒 Close", callback_data="close")],
-                    [InlineKeyboardButton("Contact Support", url=f"https://t.me/{OWNER}")]
-                ]
-            )
-        else:
-            # Subscription expired
-            response_text = (
-                "⚠️ Your premium subscription has expired.\n\n"
-                "Renew your subscription to continue enjoying premium features."
-                "\nCheck: /plans"
-            )
-            
-            buttons = InlineKeyboardMarkup(
-                [
-                    [InlineKeyboardButton("Renew Plan", callback_data="show_plans")],
-                    [InlineKeyboardButton("🔒 Close", callback_data="close")],
-                    [InlineKeyboardButton("Contact Support", url=f"https://t.me/{OWNER}")]
-                ]
-            )
-
-    else:
-        # User is not a premium member
-        response_text = "❌ You are not a premium user.\nView available plans to upgrade.\n\nClick HERE: /plans"
-        
-        buttons = InlineKeyboardMarkup(
-            [
-                [InlineKeyboardButton("View Plans", callback_data="show_plans")],
-                [InlineKeyboardButton("🔒 Close", callback_data="close")],
-                [InlineKeyboardButton("Contact Support", url=f"https://t.me/{OWNER}")]
-            ]
-        )
-
-    await message.reply_text(response_text, reply_markup=buttons)
-
-
-# Command to show subscription plans
-@Bot.on_message(filters.command('plans') & filters.private)
-async def show_plans(bot: Bot, message: Message):
-    plans_text = PAYMENT_TEXT 
-    buttons = InlineKeyboardMarkup([
-        [InlineKeyboardButton("Pᴀʏ Vɪᴀ Uᴘɪ", callback_data="upi_info")],
-        [InlineKeyboardButton("🔒 Close", callback_data="close")],
-        [InlineKeyboardButton("Contact Support", url=f"https://t.me/{OWNER}")]
-    ])
-    await message.reply(plans_text, reply_markup=buttons, parse_mode=ParseMode.HTML)
-
-# Command to show UPI payment QR code and instructions
-@Bot.on_message(filters.command('upi') & filters.private)
-async def upi_info(bot: Bot, message: Message):
-    await bot.send_photo(
-        chat_id=message.chat.id,
-        photo=PAYMENT_QR,
-        caption=PAYMENT_TEXT,
-        parse_mode=ParseMode.HTML,
-        reply_markup=InlineKeyboardMarkup(
-            [
-                [InlineKeyboardButton("Sᴇɴᴅ Sᴄʀᴇᴇɴꜱʜᴏᴛ Hᴇʀᴇ", url=f"https://t.me/{OWNER}")],
-                [InlineKeyboardButton("🔒 Close", callback_data="close")]
-            ]
-        )
+# User ki short limit set karne ka function
+async def set_user_short_limit(user_id, limit):
+    phdlust.update_one(
+        {"user_id": user_id},
+        {"$set": {"short_limit": limit}},
+        upsert=True
     )
 
-# Command to retrieve a list of active premium users (admin only)
-@Bot.on_message(filters.private & filters.command('getpremiumusers') & filters.user(ADMINS))
-async def get_premium_users(bot: Bot, message: Message):
-    try:
-        premium_users = phdlust.find({"is_premium": True, "expiry_time": {"$gt": time.time()}})
-        if not phdlust.count_documents({"is_premium": True, "expiry_time": {"$gt": time.time()}}):
-            return await message.reply("No active premium users found.")
+# User ki short limit get karne ka function (default 1)
+async def get_user_short_limit(user_id):
+    user = phdlust.find_one({"user_id": user_id})
+    return user.get("short_limit", 1) if user else 1
 
-        users_list = [
-            f"User ID: {user.get('user_id')} - Premium Expires in {max(int((user.get('expiry_time') - time.time()) / 86400), 0)} days"
-            for user in premium_users
-        ]
-        await message.reply("<b>Premium Users:</b>\n\n" + "\n".join(users_list), parse_mode=ParseMode.HTML)
+
+#-------------------------------fetch------------------------------
+
+# Fetch URL shortener configuration
+async def get_url_shortener_config(shortener_id):
+    """Fetch URL shortener configuration from the database."""
+    return url_shorteners.find_one({"_id": shortener_id})
+
+# MongoDB Helper Function for listing all shorteners
+async def get_all_shorteners():
+    """Fetch all URL shortener configurations from the database."""
+    return list(url_shorteners.find())  # Convert cursor to a list for easier handling
+
+
+# Add a new URL shortener configuration
+async def add_url_shortener(shortener_id, api_key, base_site):
+    """Add a new URL shortener configuration."""
+    url_shorteners.insert_one({
+        "_id": shortener_id,
+        "api_key": api_key,
+        "base_site": base_site
+    })
+
+# Update an existing URL shortener configuration
+async def update_url_shortener(shortener_id, api_key=None, base_site=None):
+    """Update an existing URL shortener configuration."""
+    update_data = {}
+    if api_key:
+        update_data["api_key"] = api_key
+    if base_site:
+        update_data["base_site"] = base_site
+    url_shorteners.update_one(
+        {"_id": shortener_id},
+        {"$set": update_data}
+    )
+
+# Remove a URL shortener configuration
+async def remove_url_shortener(shortener_id):
+    """Remove a URL shortener configuration."""
+    url_shorteners.delete_one({"_id": shortener_id})
+
+# List all shortener configurations
+async def get_all_shorteners():
+    return list(url_shorteners.find())
+
+
+async def get_shortlink(shortener_id, link):
+    """Generate a short link using dynamic configurations."""
+    config = await get_url_shortener_config(shortener_id)
+    if not config:
+        raise ValueError(f"No configuration found for shortener ID: {shortener_id}")
+    
+    shortzy = Shortzy(api_key=config["api_key"], base_site=config["base_site"])
+    short_link = await shortzy.convert(link)
+    return short_link
+
+# MongoDB Helper Functions
+async def add_premium_user(user_id, duration_in_days):
+    expiry_time = time.time() + (duration_in_days * 86400)  # Calculate expiry time in seconds
+    phdlust.update_one(
+        {"user_id": user_id},
+        {"$set": {"is_premium": True, "expiry_time": expiry_time}},
+        upsert=True
+    )
+
+async def remove_premium_user(user_id):
+    phdlust.update_one(
+        {"user_id": user_id},
+        {"$set": {"is_premium": False, "expiry_time": None}}
+    )
+
+async def get_user_subscription(user_id):
+    user = phdlust.find_one({"user_id": user_id})
+    if user:
+        return user.get("is_premium", False), user.get("expiry_time", None)
+    return False, None
+
+async def is_premium_user(user_id):
+    is_premium, expiry_time = await get_user_subscription(user_id)
+    if is_premium and expiry_time > time.time():
+        return True
+    return False
+
+
+
+# Function to add a delete task to the database
+async def add_delete_task(chat_id, message_id, delete_at):
+    phdlust_tasks.insert_one({
+        "chat_id": chat_id,
+        "message_id": message_id,
+        "delete_at": delete_at
+    })
+
+# Function to delete the notification after a set delay
+async def delete_notification(client, chat_id, notification_id, delay):
+    await asyncio.sleep(delay)
+    try:
+        # Delete the notification message
+        await client.delete_messages(chat_id=chat_id, message_ids=notification_id)
     except Exception as e:
-        await message.reply(f"Error: {str(e)}")
-
-
-# Command: /addshort
-@Bot.on_message(filters.command("addshort") & filters.user(ADMINS))
-async def add_shortener(bot: Bot, message: Message):
-    """Handle the /addshort command to add a new shortener."""
-    try:
-        # Expecting input like: shortener_id|api_key|base_site
-        text = message.text.split(" ", 1)
-        if len(text) < 2:
-            await message.reply_text("Please provide the shortener details in the format: id|api_key|base_site")
-            return
+        print(f"Error deleting notification {notification_id} in chat {chat_id}: {e}")
         
-        shortener_details = text[1]
-        if "|" in shortener_details:
-            shortener_id, api_key, base_site = shortener_details.split("|")
-            await add_url_shortener(shortener_id, api_key, base_site)
-            await message.reply_text(f"Shortener `{shortener_id}` added successfully!")
-        else:
-            await message.reply_text("Invalid format. Please use the format: id|api_key|base_site.")
-    except Exception as e:
-        await message.reply_text(f"An error occurred: {str(e)}")
+async def schedule_auto_delete(client, chat_id, message_id, delay):
+    delete_at = datetime.now() + timedelta(seconds=int(delay))
+    await add_delete_task(chat_id, message_id, delete_at)
+    
+    # Run deletion in the background to prevent blocking
+    async def delete_message():
+        await asyncio.sleep(int(delay))
+        try:
+            # Delete the original message
+            await client.delete_messages(chat_id=chat_id, message_ids=message_id)
+            phdlust_tasks.delete_one({"chat_id": chat_id, "message_id": message_id})  # Remove from DB
+            
+            # Send a notification about the deletion
+            notification_text = DELETE_INFORM
+            notification_msg = await client.send_message(chat_id, notification_text)
+            
+            # Schedule deletion of the notification after 60 seconds
+            asyncio.create_task(delete_notification(client, chat_id, notification_msg.id, 40))
+        
+        except Exception as e:
+            print(f"Error deleting message {message_id} in chat {chat_id}: {e}")
 
-# Command: /resetshort
-@Bot.on_message(filters.command("resetshort") & filters.user(ADMINS))
-async def reset_shortener(bot: Bot, message: Message):
-    """Handle the /resetshort command to remove a shortener."""
+    asyncio.create_task(delete_message())  
+
+
+async def delete_notification_after_delay(client, chat_id, message_id, delay):
+    await asyncio.sleep(delay)
     try:
-        # Expecting the shortener ID as the argument
-        text = message.text.split(" ", 1)
-        if len(text) < 2:
-            await message.reply_text("Please provide the shortener ID to reset.")
-            return
-
-        shortener_id = text[1]
-        await remove_url_shortener(shortener_id)
-        await message.reply_text(f"Shortener `{shortener_id}` has been removed successfully!")
+        # Delete the notification message
+        await client.delete_messages(chat_id=chat_id, message_ids=message_id)
     except Exception as e:
-        await message.reply_text(f"An error occurred: {str(e)}")
-
-async def get_all_url_shorteners():
-    """Fetch all URL shortener configurations from the database."""
-    return url_shorteners.find()  # This retrieves all documents from the "url_shorteners" collection.
-
-# Command: /resetuser
-@Bot.on_message(filters.command("resetuser") & filters.user(ADMINS))
-async def reset_user(bot: Bot, message: Message):
-    """Handle the /resetuser command to remove specific user data."""
-    try:
-        # Expecting the user ID as the argument
-        text = message.text.split(" ", 1)
-        if len(text) < 2:
-            await message.reply_text("Please provide the user ID to reset.")
-            return
-
-        user_id = text[1]
-        result = phdlust.delete_one({"user_id": int(user_id)})  # Ensure user_id is treated as an integer
-        if result.deleted_count > 0:
-            await message.reply_text(f"User data for user ID `{user_id}` has been removed successfully!")
-        else:
-            await message.reply_text(f"No data found for user ID `{user_id}`.")
-    except Exception as e:
-        await message.reply_text(f"An error occurred: {str(e)}")
-
-# MongoDB Helper Function for listing all shorteners
-async def get_all_shorteners():
-    """Fetch all URL shortener configurations from the database."""
-    return list(url_shorteners.find())  # Convert cursor to a list for easier handling
+        print(f"Error deleting notification {message_id} in chat {chat_id}: {e}")
 
 
-# Command: /viewshorteners
-@Bot.on_message(filters.command("viewshorteners") & filters.user(ADMINS))
-async def view_shorteners(bot: Bot, message: Message):
-    """Handle the /viewshorteners command to list all URL shortener configurations."""
-    try:
-        shorteners = await get_all_shorteners()
-        if not shorteners:
-            await message.reply_text("No URL shorteners found in the database.")
-            return
+@Client.on_message(filters.command("start") & filters.private & subscribed)
+async def start_command(client: Client, message):
+    user_id = message.from_user.id
 
-        response = "URL Shortener Configurations:\n"
-        for shortener in shorteners:
-            response += (
-                f"ID: `{shortener['_id']}`\n"
-                f"API Key: `{shortener['api_key']}`\n"
-                f"Base Site: `{shortener['base_site']}`\n\n"
+    if not await present_user(user_id):
+        try:
+            await add_user(user_id)
+            logger.info(f"Added new user with ID: {user_id}")
+        except Exception as e:
+            logger.error(f"Error adding user {user_id}: {e}")
+
+    premium_status = await is_premium_user(user_id)
+
+    if len(message.text) > 7:
+        base64_string = message.text.split(" ", 1)[1]
+        is_premium_link = False
+
+        try:
+            decoded_string = await decode_premium(base64_string)
+            is_premium_link = True
+        except Exception as e:
+            try:
+                decoded_string = await decode(base64_string)
+            except Exception as e:
+                await message.reply_text("Invalid link provided. \n\nGet help /upi")
+                return
+
+        if "vip-" in decoded_string: # and not premium_status:
+            normal_link = decoded_string.replace("vip-", "get-")
+            phdlust_tasks = await encode(normal_link)  # <-- yahan variable ka naam badla
+            linkb = f"https://t.me/{client.username}?start={phdlust_tasks}"
+            #linkb = shorten_url_tinyurl(linkb)
+        
+            if await is_premium_user(user_id):
+                # Provide direct link for premium users
+                short_link = linkb
+                caption = "🔰 Yᴏᴜ Aʀᴇ Pʀᴇᴍɪᴜᴍ Uꜱᴇʀ ✅\nCʟɪᴄᴋ Bᴇʟᴏᴡ Bᴜᴛᴛᴏɴ Tᴏ Wᴀᴛᴄʜ Dɪʀᴇᴄᴛʟʏ"
+                button_text = "Cʟɪᴄᴋ Tᴏ Wᴀᴛᴄʜ"
+        
+            # ...existing code...
+            else:
+                # Generate a shortened link for non-premium users
+                shortener_ids = ["myshortener1", "myshortener2", "myshortener3"]
+                phdlust_magic = random.choice(shortener_ids)
+
+                # --- Yahan se limit check code add karein ---
+                user_short_limit = await get_user_short_limit(user_id)
+                user_data = phdlust.find_one({"user_id": user_id})
+                used_count = user_data.get("short_used", 0) if user_data else 0
+
+                if used_count >= user_short_limit:
+                    await message.reply(f"❌ Aap apni short limit ({user_short_limit}) poori kar chuke hain.\nLimit reset karne ke liye /settime use karein.")
+                    return
+
+                phdlust.update_one(
+                    {"user_id": user_id},
+                    {"$inc": {"short_used": 1}},
+                    upsert=True
+                )
+                # --- Yahan tak ---
+
+                try:
+                    short_link = await get_shortlink(phdlust_magic, linkb)
+                    short_link = shorten_url_clckru(short_link)
+                except Exception:
+                    await message.reply("Failed to generate a short link. Please try again later.\nContact admin @DshDm_bot")
+                    return
+            # ...existing code...
+        
+            buttons = [
+                [InlineKeyboardButton(button_text, url=short_link), InlineKeyboardButton("∙ ᴛᴜᴛσʀɪᴧʟ ᴠɪᴅ ∙", url=TUT_VID)],
+                [InlineKeyboardButton("∘ ᴘʀєϻɪᴜϻ ∘", callback_data="upi_info")]
+            ]
+        
+            verification_message = await message.reply(
+                caption if hasattr(message, 'reply_photo') else caption,
+                reply_markup=InlineKeyboardMarkup(buttons),
+                quote=True
             )
+            return  # End execution for non-premium users
 
-        await message.reply_text(response)
-    except Exception as e:
-        await message.reply_text(f"An error occurred: {str(e)}")
+        argument = decoded_string.split("-")
+        ids = []
 
-# MongoDB Helper Function for listing all shorteners
-async def get_all_shorteners():
-    """Fetch all URL shortener configurations from the database."""
-    return list(url_shorteners.find())  # Convert cursor to a list for easier handling
+        if len(argument) == 3:
+            start = int(int(argument[1]) / abs(client.db_channel.id))
+            end = int(int(argument[2]) / abs(client.db_channel.id))
+            ids = list(range(start, end + 1)) if start <= end else list(range(end, start + 1))
+        elif len(argument) == 2:
+            ids = [int(int(argument[1]) / abs(client.db_channel.id))]
+
+        temp_msg = await message.reply("Please wait...")
+        #asyncio.create_task(schedule_auto_delete(client, temp_msg.chat.id, temp_msg.id, delay=600))
+
+        try:
+            messages = await get_messages(client, ids)
+        except:
+            error_msg = await message.reply_text("Something went wrong..!")
+            return
+        await temp_msg.delete()
+
+        phdlusts = []
+        messages = await get_messages(client, ids)
+        for msg in messages:
+            if bool(CUSTOM_CAPTION) & bool(msg.document):
+                caption = CUSTOM_CAPTION.format(previouscaption = "" if not msg.caption else msg.caption.html, filename = msg.document.file_name)
+            else:
+                caption = "" if not msg.caption else msg.caption.html
+
+            if DISABLE_CHANNEL_BUTTON:
+                reply_markup = msg.reply_markup
+            else:
+                reply_markup = None
+            
+            try:
+                messages = await get_messages(client, ids)
+                phdlust = await msg.copy(chat_id=message.from_user.id, caption=caption, reply_markup=reply_markup , protect_content=PROTECT_CONTENT)
+                phdlusts.append(phdlust)
+                if AUTO_DELETE == True:
+                    #await message.reply_text(f"The message will be automatically deleted in {delete_after} seconds.")
+                    asyncio.create_task(schedule_auto_delete(client, phdlust.chat.id, phdlust.id, delay=DELETE_AFTER))
+                await asyncio.sleep(0.2)      
+                #asyncio.sleep(0.2)
+            except FloodWait as e:
+                await asyncio.sleep(e.x)
+                phdlust = await msg.copy(chat_id=message.from_user.id, caption=caption, reply_markup=reply_markup , protect_content=PROTECT_CONTENT)
+                phdlusts.append(phdlust)     
+
+        # Notify user to get file again if messages are auto-deleted
+        if GET_AGAIN == True:
+            get_file_markup = InlineKeyboardMarkup([
+                [InlineKeyboardButton("GET FILE AGAIN", url=f"https://t.me/{client.username}?start={message.text.split()[1]}")]
+            ])
+            await message.reply(GET_INFORM, reply_markup=get_file_markup)
+
+        if AUTO_DELETE == True:
+            delete_notification = await message.reply(NOTIFICATION)
+            asyncio.create_task(delete_notification_after_delay(client, delete_notification.chat.id, delete_notification.id, delay=NOTIFICATION_TIME))
+
+    else:
+        reply_markup = InlineKeyboardMarkup(
+            [
+                [InlineKeyboardButton("😊 About Me", callback_data="about"), InlineKeyboardButton("🔒 Close", callback_data="close")],
+                [InlineKeyboardButton("✨ Upgrade to Premium" if not premium_status else "✨ Premium Content", callback_data="premium_content")],
+            ]
+        )
+        
+        sent_message = await message.reply_photo(
+            photo=get_random_image(START_PICS),
+            caption=START_MSG.format(
+                    first=message.from_user.first_name,
+                    last=message.from_user.last_name,
+                    username=None if not message.from_user.username else '@' + message.from_user.username,
+                    mention=message.from_user.mention,
+                    id=message.from_user.id
+            ),
+            
+            reply_markup=reply_markup,
+            #disable_web_page_preview=True, #To of pic -> give #to photo and remove me frome #
+            quote=True
+        )
+        #asyncio.create_task(schedule_auto_delete(client, sent_message.chat.id, sent_message.id, delay=autodelete))
+        logger.info(f"Sent welcome message to user {user_id} with premium status: {premium_status}")
+
+    
+#=====================================================================================##
+
+WAIT_MSG = """"<b>Processing ...</b>"""
+
+REPLY_ERROR = """<code>Use this command as a replay to any telegram message with out any spaces.</code>"""
+
+#=====================================================================================##
+
+    
+@Bot.on_message(filters.command("start") & filters.private)
+async def not_joined(client: Client, message: Message):
+    user_id = message.from_user.id
+    buttons, row = [], []
+
+    for i, ch in enumerate(FORCE_SUB_CHANNELS):
+        try:
+            url = await client.export_chat_invite_link(ch)
+            row.append(InlineKeyboardButton(f"📍 Join Fast {i+1} 📍", url=url))
+            if len(row) == 2:
+                buttons.append(row)
+                row = []
+        except: pass
+
+    if row: buttons.append(row)
+
+    try_again = []
+    if len(message.command) > 1:
+        try_again = [InlineKeyboardButton("🔁 Try Again", url=f"https://t.me/{client.username}?start={message.command[1]}")]
+
+    if try_again: buttons.append(try_again)
+
+    await message.reply_photo(
+        photo=get_random_image(FORCE_PICS),
+        caption=FORCE_MSG.format(
+            first=message.from_user.first_name,
+            last=message.from_user.last_name,
+            username=("@" + message.from_user.username) if message.from_user.username else None,
+            mention=message.from_user.mention,
+            id=message.from_user.id
+        ),
+        reply_markup=InlineKeyboardMarkup(buttons),
+        quote=True
+    )
+
+
+
+@Bot.on_message(filters.command('users') & filters.private & filters.user(ADMINS))
+async def get_users(client: Bot, message: Message):
+    msg = await client.send_message(chat_id=message.chat.id, text=WAIT_MSG)
+    users = await full_userbase()
+    await msg.edit(f"{len(users)} users are using this bot")
+
+@Bot.on_message(filters.private & filters.command('broadcast') & filters.user(ADMINS))
+async def send_text(client: Bot, message: Message):
+    if message.reply_to_message:
+        query = await full_userbase()
+        broadcast_msg = message.reply_to_message
+        total = 0
+        successful = 0
+        blocked = 0
+        deleted = 0
+        unsuccessful = 0
+        
+        pls_wait = await message.reply("<i>Broadcasting Message.. This will Take Some Time</i>")
+        for chat_id in query:
+            try:
+                await broadcast_msg.copy(chat_id)
+                successful += 1
+            except FloodWait as e:
+                await asyncio.sleep(e.x)
+                await broadcast_msg.copy(chat_id)
+                successful += 1
+            except UserIsBlocked:
+                await del_user(chat_id)
+                blocked += 1
+            except InputUserDeactivated:
+                await del_user(chat_id)
+                deleted += 1
+            except:
+                unsuccessful += 1
+                pass
+            total += 1
+        
+        status = f"""<b><u>Broadcast Completed</u>
+
+Total Users: <code>{total}</code>
+Successful: <code>{successful}</code>
+Blocked Users: <code>{blocked}</code>
+Deleted Accounts: <code>{deleted}</code>
+Unsuccessful: <code>{unsuccessful}</code></b>"""
+        
+        return await pls_wait.edit(status)
+
+    else:
+        msg = await message.reply(REPLY_ERROR)
+        await asyncio.sleep(8)
+        await msg.delete()
+
+# At the end of the file or after Bot is initialized, start the scheduler
+# (Make sure to pass both bot_instance and phdlust)
+import asyncio
+from bot import Bot
+
+bot_instance = Bot()
+
+async def on_startup():
+    start_premium_reminder_scheduler(bot_instance, phdlust)
+
+asyncio.get_event_loop().create_task(on_startup())
+
