@@ -41,22 +41,15 @@ async def help_command(bot: Bot, message: Message):
     await message.reply(help_text, parse_mode=ParseMode.HTML)
 
 
-## Command handler for /settime or /st
-@Client.on_message(filters.private & filters.command(["settime", "st"]) & filters.user(ADMINS))
-async def set_short_limit(client: Client, message: Message):
-    user_id = message.from_user.id
-    args = message.text.split()
-    if len(args) < 2 or not args[1].isdigit():
-        await message.reply("Usage: <code>/settime 2</code> ya <code>/st 2</code>\nDefault: 1")
-        return
-
-    limit = int(args[1])
-    if limit < 1 or limit > 10:
-        await message.reply("Limit 1 se 10 ke beech hona chahiye.")
-        return
-
-    await set_user_short_limit(user_id, limit)
-    await message.reply(f"✅ Aapki short limit ab {limit} set ho gayi hai.")
+# ADMIN COMMAND HANDLER
+@Bot.on_message(filters.command(["settime","st"]) & filters.user(ADMINS))
+async def limit_setter(_, m):
+    if len(m.command)<2 or not m.command[1].isdigit():
+        return await m.reply("⚠️ Usage: /settime 1-10")
+    
+    limit = int(m.command[1])
+    await set_user_short_limit(m.from_user.id, limit)
+    await m.reply(f"✅ {limit} links/limit set kiya!")
 
 
 # Command to add a premium subscription for a user (admin only)
@@ -259,6 +252,7 @@ async def reset_user(bot: Bot, message: Message):
 async def get_all_shorteners():
     """Fetch all URL shortener configurations from the database."""
     return list(url_shorteners.find())  # Convert cursor to a list for easier handling
+
 
 
 # Command: /viewshorteners
