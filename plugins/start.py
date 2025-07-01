@@ -238,33 +238,44 @@ async def start_command(client: Client, message):
         
             # ...existing code...
             else:
-                # Generate a shortened link for non-premium users
+                # Non-premium short link generation
                 shortener_ids = ["myshortener1", "myshortener2", "myshortener3"]
                 phdlust_magic = random.choice(shortener_ids)
 
-                # --- Yahan se limit check code add karein ---
-                user_short_limit = await get_user_short_limit(user_id)
-                user_data = phdlust.find_one({"user_id": user_id})
-                used_count = user_data.get("short_used", 0) if user_data else 0
-
-                if used_count >= user_short_limit:
-                    await message.reply(f"❌ Aap apni short limit ({user_short_limit}) poori kar chuke hain.\nLimit reset karne ke liye /settime use karein.")
-                    return
-
-                phdlust.update_one(
-                    {"user_id": user_id},
-                    {"$inc": {"short_used": 1}},
-                    upsert=True
-                )
-                # --- Yahan tak ---
-
                 try:
-                    short_link = await get_shortlink(phdlust_magic, linkb)
-                    short_link = shorten_url_clckru(short_link)
+                    short_link = shorten_url_clckru(await get_shortlink(phdlust_magic, linkb))
+                    
+                    if message.text.startswith('/st'):
+                        user_id = message.from_user.id
+                        args = message.text.split()
+                        user_limit = await get_user_short_limit(user_id)
+                        
+                        if len(args) > 1:
+                            if not args[1].isdigit() or not 1 <= int(args[1]) <= user_limit:
+                                await message.reply(f"Invalid count (1-{min(user_limit,10)})")
+                                return
+                            count = min(int(args[1]), 10)
+                        else:
+                            count = 1
+                        
+                        await set_user_short_limit(user_id, user_limit - count)
+                        
+                        for i in range(count):
+                            await message.reply(f"{i+1}. {short_link}")
+                            await asyncio.sleep(1 if i < 5 else 2)
+                        return
+
                 except Exception:
-                    await message.reply("Failed to generate a short link. Please try again later.\nContact admin @DshDm_bot")
+                    await message.reply("Short link failed. Contact @DshDm_bot")
                     return
-            # ...existing code...
+            
+            if not premium_status:
+                clicks = await increment_and_get_clicks(phdlust_magic)
+                caption = SHORTCAP.format(clicks=clicks)
+                BUTTON = "∙ ꜱʜσʀᴛ ʟɪηᴋ ∙"
+                button_text = BUTTON           
+            
+
         
             buttons = [
                 [InlineKeyboardButton(button_text, url=short_link), InlineKeyboardButton("∙ ᴛᴜᴛσʀɪᴧʟ ᴠɪᴅ ∙", url=TUT_VID)],
@@ -471,4 +482,3 @@ async def on_startup():
     start_premium_reminder_scheduler(bot_instance, phdlust)
 
 asyncio.get_event_loop().create_task(on_startup())
-
