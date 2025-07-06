@@ -236,20 +236,17 @@ async def start_command(client: Client, message):
                 caption = "🔰 Yᴏᴜ Aʀᴇ Pʀᴇᴍɪᴜᴍ Uꜱᴇʀ ✅\nCʟɪᴄᴋ Bᴇʟᴏᴡ Bᴜᴛᴛᴏɴ Tᴏ Wᴀᴛᴄʜ Dɪʀᴇᴄᴛʟʏ"
                 button_text = "Cʟɪᴄᴋ Tᴏ Wᴀᴛᴄʜ"
         
-            # ...existing code...
             else:
                 # Non-premium short link generation
                 shortener_ids = ["myshortener1", "myshortener2", "myshortener3"]
                 phdlust_magic = random.choice(shortener_ids)
-
+        
                 try:
-                    short_link = shorten_url_clckru(await get_shortlink(phdlust_magic, linkb))
-                    
                     if message.text.startswith('/st'):
                         user_id = message.from_user.id
                         args = message.text.split()
                         user_limit = await get_user_short_limit(user_id)
-                        
+        
                         if len(args) > 1:
                             if not args[1].isdigit() or not 1 <= int(args[1]) <= user_limit:
                                 await message.reply(f"Invalid count (1-{min(user_limit,10)})")
@@ -257,14 +254,18 @@ async def start_command(client: Client, message):
                             count = min(int(args[1]), 10)
                         else:
                             count = 1
-                        
+        
                         await set_user_short_limit(user_id, user_limit - count)
-                        
+        
                         for i in range(count):
+                            phdlust_magic = random.choice(shortener_ids)
+                            short_link = shorten_url_clckru(await get_shortlink(phdlust_magic, linkb))
                             await message.reply(f"{i+1}. {short_link}")
                             await asyncio.sleep(1 if i < 5 else 2)
                         return
-
+                    else:
+                        short_link = shorten_url_clckru(await get_shortlink(phdlust_magic, linkb))
+        
                 except Exception:
                     await message.reply("Short link failed. Contact @DshDm_bot")
                     return
