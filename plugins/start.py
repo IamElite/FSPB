@@ -243,20 +243,21 @@ async def start_command(client: Client, message):
         
                 try:
                     if message.text.startswith('/st'):
-                        user_id = message.from_user.id
                         args = message.text.split()
                         user_limit = await get_user_short_limit(user_id)
-        
-                        if len(args) > 1:
-                            if not args[1].isdigit() or not 1 <= int(args[1]) <= user_limit:
+                    
+                        if len(args) > 2:
+                            linkb = args[1]
+                            if not args[2].isdigit() or not 1 <= int(args[2]) <= user_limit:
                                 await message.reply(f"Invalid count (1-{min(user_limit,10)})")
                                 return
-                            count = min(int(args[1]), 10)
+                            count = min(int(args[2]), 10)
                         else:
-                            count = 1
-        
+                            await message.reply("Usage: /st <link> <count>")
+                            return
+                    
                         await set_user_short_limit(user_id, user_limit - count)
-        
+                    
                         for i in range(count):
                             phdlust_magic = random.choice(shortener_ids)
                             short_link = shorten_url_clckru(await get_shortlink(phdlust_magic, linkb))
