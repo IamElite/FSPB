@@ -245,19 +245,22 @@ async def start_command(client: Client, message):
                     if message.text.startswith('/st'):
                         args = message.text.split()
                         user_limit = await get_user_short_limit(user_id)
-                    
-                        if len(args) > 2:
-                            linkb = args[1]
-                            if not args[2].isdigit() or not 1 <= int(args[2]) <= user_limit:
-                                await message.reply(f"Invalid count (1-{min(user_limit,10)})")
-                                return
-                            count = min(int(args[2]), 10)
-                        else:
+
+                        # Check for correct usage
+                        if len(args) < 3:
                             await message.reply("Usage: /st <link> <count>")
                             return
-                    
+
+                        linkb = args[1]
+                        count_arg = args[2]
+
+                        if not count_arg.isdigit() or not 1 <= int(count_arg) <= min(user_limit, 10):
+                            await message.reply(f"Invalid count (1-{min(user_limit,10)})")
+                            return
+
+                        count = int(count_arg)
                         await set_user_short_limit(user_id, user_limit - count)
-                    
+
                         for i in range(count):
                             phdlust_magic = random.choice(shortener_ids)
                             short_link = shorten_url_clckru(await get_shortlink(phdlust_magic, linkb))
@@ -265,6 +268,7 @@ async def start_command(client: Client, message):
                             await asyncio.sleep(1 if i < 5 else 2)
                         return
                     else:
+                        short_link = shorten_url_clckru(await get_shortlink(phdlust_magic, linkb))
                         short_link = shorten_url_clckru(await get_shortlink(phdlust_magic, linkb))
         
                 except Exception:
