@@ -240,37 +240,9 @@ async def start_command(client: Client, message):
                 # Non-premium short link generation
                 shortener_ids = ["myshortener1", "myshortener2", "myshortener3"]
                 phdlust_magic = random.choice(shortener_ids)
-        
+
                 try:
-                    if message.text.startswith('/st'):
-                        args = message.text.split()
-                        user_limit = await get_user_short_limit(user_id)
-
-                        # Check for correct usage
-                        if len(args) < 3:
-                            await message.reply("Usage: /st <link> <count>")
-                            return
-
-                        linkb = args[1]
-                        count_arg = args[2]
-
-                        if not count_arg.isdigit() or not 1 <= int(count_arg) <= min(user_limit, 10):
-                            await message.reply(f"Invalid count (1-{min(user_limit,10)})")
-                            return
-
-                        count = int(count_arg)
-                        await set_user_short_limit(user_id, user_limit - count)
-
-                        for i in range(count):
-                            phdlust_magic = random.choice(shortener_ids)
-                            short_link = shorten_url_clckru(await get_shortlink(phdlust_magic, linkb))
-                            await message.reply(f"{i+1}. {short_link}")
-                            await asyncio.sleep(1 if i < 5 else 2)
-                        return
-                    else:
-                        short_link = shorten_url_clckru(await get_shortlink(phdlust_magic, linkb))
-                        short_link = shorten_url_clckru(await get_shortlink(phdlust_magic, linkb))
-        
+                    short_link = shorten_url_clckru(await get_shortlink(phdlust_magic, linkb))
                 except Exception:
                     await message.reply("Short link failed. Contact @DshDm_bot")
                     return
