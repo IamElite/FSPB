@@ -242,10 +242,20 @@ async def start_command(client: Client, message):
                 phdlust_magic = random.choice(shortener_ids)
 
                 try:
-                    short_link = shorten_url_clckru(await get_shortlink(phdlust_magic, linkb))
+                    user_id = message.from_user.id
+                
+                    user_data = await phdlust.find_one({"_id": user_id})
+                    count = user_data.get("short_count", 1) if user_data else 1
+                
+                    short_link = linkb  # Starting link
+                
+                    for _ in range(count):
+                        short_link = shorten_url_clckru(await get_shortlink(phdlust_magic, short_link))
+                
                 except Exception:
-                    await message.reply("Short link failed. Contact @DshDm_bot")
+                    await message.reply_text("Short link failed. Contact @DshDm_bot")
                     return
+
             
             if not premium_status:
                 clicks = await increment_and_get_clicks(phdlust_magic)
