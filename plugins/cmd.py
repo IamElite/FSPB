@@ -2,6 +2,7 @@
 from bot import Bot
 from pyrogram import filters
 from config import *
+from database.utils import *
 from datetime import datetime
 from plugins.start import *
 from pyrogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
@@ -55,33 +56,30 @@ async def set_or_get_short_count(client, message):
         count = user_data.get("short_count", 1) if user_data else 1
         await message.reply_text(f"⚠️ Usage: /settime 1\n\nℹ️ Current active: {count}x")
 
-# Premium commands remain unchanged:
+# ✅ Updated /addpr command to support ID/username/reply
 @Bot.on_message(filters.private & filters.command('addpr') & filters.user(ADMINS))
 async def add_premium(bot: Bot, message: Message):
-    try:
-        args = message.text.split()
-        if len(args) < 3:
-            return await message.reply("Usage: /addpr 'user_id' 'duration_in_days'")
+    target_user_id = await extract_user(bot, message)
+    args = message.text.split()
 
-        target_user_id = int(args[1])
-        duration_in_days = int(args[2])
-        await add_premium_user(target_user_id, duration_in_days)
-        await message.reply(f"User {target_user_id} added to premium for {duration_in_days} days.")
-    except Exception as e:
-        await message.reply(f"Error: {str(e)}")
+    if not target_user_id:
+        return await message.reply("❌ Invalid user. Use ID, username, or reply to user.")
+    if len(args) < 3 or not args[2].isdigit():
+        return await message.reply("Usage: /addpr user duration_in_days")
 
+    duration_in_days = int(args[2])
+    await add_premium_user(target_user_id, duration_in_days)
+    await message.reply(f"✅ User {target_user_id} added to premium for {duration_in_days} days.")
+
+# ✅ Updated /removepr command to support ID/username/reply
 @Bot.on_message(filters.private & filters.command('removepr') & filters.user(ADMINS))
 async def remove_premium(bot: Bot, message: Message):
-    try:
-        args = message.text.split()
-        if len(args) < 2:
-            return await message.reply("Usage: /removepr 'user_id'")
+    target_user_id = await extract_user(bot, message)
+    if not target_user_id:
+        return await message.reply("❌ Invalid user. Use ID, username, or reply to user.")
 
-        target_user_id = int(args[1])
-        await remove_premium_user(target_user_id)
-        await message.reply(f"User {target_user_id} removed from premium.")
-    except Exception as e:
-        await message.reply(f"Error: {str(e)}")
+    await remove_premium_user(target_user_id)
+    await message.reply(f"✅ User {target_user_id} removed from premium.")
 
 
 @Bot.on_message(filters.command('myplan') & filters.private)
