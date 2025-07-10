@@ -252,7 +252,8 @@ async def start_command(client: Client, message):
                     for _ in range(count):
                         short_link = shorten_url_clckru(await get_shortlink(phdlust_magic, short_link))
                 
-                except Exception:
+                except Exception as e:
+                    print("❌ Error:", e)
                     await message.reply_text("Short link failed. Contact @DshDm_bot")
                     return
 
