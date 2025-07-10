@@ -41,15 +41,30 @@ async def help_command(bot: Bot, message: Message):
     await message.reply(help_text, parse_mode=ParseMode.HTML)
 
 
-# ADMIN COMMAND HANDLER
-@Bot.on_message(filters.command(["settime","st"]) & filters.user(ADMINS))
-async def limit_setter(_, m):
-    if len(m.command)<2 or not m.command[1].isdigit():
-        return await m.reply("⚠️ Usage: /settime 1-10")
-    
-    limit = int(m.command[1])
-    await set_user_short_limit(m.from_user.id, limit)
-    await m.reply(f"✅ {limit} links/limit set kiya!")
+@Bot.on_message(filters.command(["settime", "st"]) & filters.user(ADMINS))
+async def set_or_get_short_count(client, message):
+    parts = message.text.strip().split()
+    user_id = message.from_user.id
+
+    # Agar number diya gaya ho: /st 2
+    if len(parts) > 1 and parts[1].isdigit():
+        count = int(parts[1])
+
+        await phdlust.update_one(
+            {"_id": user_id},
+            {"$set": {"short_count": count}},
+            upsert=True
+        )
+
+        await message.reply_text(f"✅ Short link count set to {count}x")
+
+    # Agar number NA diya ho: /st
+    else:
+        user_data = await phdlust.find_one({"_id": user_id})
+        count = user_data.get("short_count", 1) if user_data else 1
+
+        await message.reply_text(f"⚠️ Usage: /settime 1\n\nℹ️ Current active: {count}x")
+
 
 
 # Command to add a premium subscription for a user (admin only)
