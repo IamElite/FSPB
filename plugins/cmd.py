@@ -5,6 +5,7 @@ from config import *
 from database.utils import *
 from datetime import datetime
 from plugins.start import *
+from plugins.start import phdlust
 from pyrogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
 from pyrogram.enums import ParseMode
 import time
@@ -43,7 +44,7 @@ async def help_command(bot: Bot, message: Message):
 
 
 @Bot.on_message(filters.command(["settime", "st"]) & filters.user(ADMINS))
-async def set_or_get_short_count(client, message):
+async def set_or_get_short_count(client, message, phdlust):
     parts = message.text.strip().split()
     user_id = message.from_user.id
 
