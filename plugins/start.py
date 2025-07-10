@@ -224,34 +224,28 @@ async def start_command(client: Client, message):
                 await message.reply_text("Invalid link provided. \n\nGet help /upi")
                 return
 
-        if "vip-" in decoded_string: # and not premium_status:
+        if "vip-" in decoded_string:
             normal_link = decoded_string.replace("vip-", "get-")
-            phdlust = await encode(normal_link)  # <-- yahan variable ka naam badla
-            linkb = f"https://t.me/{client.username}?start={phdlust}"
-            #linkb = shorten_url_tinyurl(linkb)
+            phdlust_code = await encode(normal_link)
+            linkb = f"https://t.me/{client.username}?start={phdlust_code}"
         
             if await is_premium_user(user_id):
-                # Provide direct link for premium users
                 short_link = linkb
                 caption = "🔰 Yᴏᴜ Aʀᴇ Pʀᴇᴍɪᴜᴍ Uꜱᴇʀ ✅\nCʟɪᴄᴋ Bᴇʟᴏᴡ Bᴜᴛᴛᴏɴ Tᴏ Wᴀᴛᴄʜ Dɪʀᴇᴄᴛʟʏ"
                 button_text = "Cʟɪᴄᴋ Tᴏ Wᴀᴛᴄʜ"
-        
             else:
-                # Non-premium short link generation
                 shortener_ids = ["myshortener1", "myshortener2", "myshortener3"]
                 phdlust_magic = random.choice(shortener_ids)
-
+        
                 try:
                     user_id = message.from_user.id
-                
-                    user_data = await phdlust.find_one({"_id": user_id})
+                    user_data = phdlust.find_one({"_id": user_id})  # ✅ No await for PyMongo
                     count = user_data.get("short_count", 1) if user_data else 1
-                
-                    short_link = linkb  # Starting link
-                
+        
+                    short_link = linkb
                     for _ in range(count):
                         short_link = shorten_url_clckru(await get_shortlink(phdlust_magic, short_link))
-                
+        
                 except Exception as e:
                     print("❌ Error:", e)
                     await message.reply_text("Short link failed. Contact @DshDm_bot")
