@@ -1,4 +1,5 @@
 import asyncio, time
+from Bot import bot
 
 
 async def extract_user(bot, message):
