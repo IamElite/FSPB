@@ -46,11 +46,10 @@ async def set_or_get_short_count(client, message):
     parts = message.text.strip().split()
     user_id = message.from_user.id
 
-    # Agar number diya gaya ho: /st 2
     if len(parts) > 1 and parts[1].isdigit():
         count = int(parts[1])
 
-        await phdlust.update_one(
+        phdlust.update_one(
             {"_id": user_id},
             {"$set": {"short_count": count}},
             upsert=True
@@ -58,11 +57,9 @@ async def set_or_get_short_count(client, message):
 
         await message.reply_text(f"✅ Short link count set to {count}x")
 
-    # Agar number NA diya ho: /st
     else:
-        user_data = await phdlust.find_one({"_id": user_id})
+        user_data = phdlust.find_one({"_id": user_id})
         count = user_data.get("short_count", 1) if user_data else 1
-
         await message.reply_text(f"⚠️ Usage: /settime 1\n\nℹ️ Current active: {count}x")
 
 
