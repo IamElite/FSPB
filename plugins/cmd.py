@@ -5,7 +5,6 @@ from config import *
 from database.utils import *
 from datetime import datetime
 from plugins.start import *
-from plugins.start import phdlust
 from pyrogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
 from pyrogram.enums import ParseMode
 import time
@@ -44,18 +43,19 @@ async def help_command(bot: Bot, message: Message):
 
 
 @Bot.on_message(filters.command(["settime", "st"]) & filters.user(ADMINS))
-async def set_or_get_short_count(client, message, phdlust):
+async def set_or_get_short_count(client, message):
     parts = message.text.strip().split()
     user_id = message.from_user.id
 
     if len(parts) > 1 and parts[1].isdigit():
         count = int(parts[1])
-        phdlust.update_one({"_id": user_id}, {"$set": {"short_count": count}}, upsert=True)
+        await set_user_short_limit(user_id, count)
         await message.reply_text(f"✅ Short link count set to {count}x")
     else:
-        user_data = phdlust.find_one({"_id": user_id})  # ✅ No await
-        count = user_data.get("short_count", 1) if user_data else 1
-        await message.reply_text(f"⚠️ Usage: /settime 1\n\nℹ️ Current active: {count}x")
+        count = await get_user_short_limit(user_id)
+        await message.reply_text(
+            f"⚠️ Usage: /settime 1\n\nℹ️ Current active: {count}x"
+        )
 
 # ✅ Updated /addpr command to support ID/username/reply
 @Bot.on_message(filters.private & filters.command('addpr') & filters.user(ADMINS))
