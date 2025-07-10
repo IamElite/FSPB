@@ -48,33 +48,21 @@ async def set_or_get_short_count(client, message):
 
     if len(parts) > 1 and parts[1].isdigit():
         count = int(parts[1])
-
-        phdlust.update_one(
-            {"_id": user_id},
-            {"$set": {"short_count": count}},
-            upsert=True
-        )
-
+        phdlust.update_one({"_id": user_id}, {"$set": {"short_count": count}}, upsert=True)
         await message.reply_text(f"✅ Short link count set to {count}x")
-
     else:
-        user_data = phdlust.find_one({"_id": user_id})
+        user_data = phdlust.find_one({"_id": user_id})  # ✅ No await
         count = user_data.get("short_count", 1) if user_data else 1
         await message.reply_text(f"⚠️ Usage: /settime 1\n\nℹ️ Current active: {count}x")
 
-
-
-# Command to add a premium subscription for a user (admin only)
+# Premium commands remain unchanged:
 @Bot.on_message(filters.private & filters.command('addpr') & filters.user(ADMINS))
 async def add_premium(bot: Bot, message: Message):
-    if message.from_user.id not in ADMINS:
-        return await message.reply("You don't have permission to add premium users.")
-
     try:
         args = message.text.split()
         if len(args) < 3:
             return await message.reply("Usage: /addpr 'user_id' 'duration_in_days'")
-        
+
         target_user_id = int(args[1])
         duration_in_days = int(args[2])
         await add_premium_user(target_user_id, duration_in_days)
@@ -82,22 +70,19 @@ async def add_premium(bot: Bot, message: Message):
     except Exception as e:
         await message.reply(f"Error: {str(e)}")
 
-# Command to remove a premium subscription for a user (admin only)
 @Bot.on_message(filters.private & filters.command('removepr') & filters.user(ADMINS))
 async def remove_premium(bot: Bot, message: Message):
-    if message.from_user.id not in ADMINS:
-        return await message.reply("You don't have permission to remove premium users.")
-
     try:
         args = message.text.split()
         if len(args) < 2:
             return await message.reply("Usage: /removepr 'user_id'")
-        
+
         target_user_id = int(args[1])
         await remove_premium_user(target_user_id)
         await message.reply(f"User {target_user_id} removed from premium.")
     except Exception as e:
         await message.reply(f"Error: {str(e)}")
+
 
 @Bot.on_message(filters.command('myplan') & filters.private)
 async def my_plan(bot: Bot, message: Message):
