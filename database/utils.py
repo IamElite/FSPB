@@ -1,5 +1,22 @@
 import asyncio, time
 
+
+async def extract_user(bot, message):
+    if message.reply_to_message:
+        return message.reply_to_message.from_user.id
+    args = message.text.split()
+    if len(args) > 1:
+        target = args[1]
+        if target.isdigit():
+            return int(target)
+        try:
+            user = await bot.get_users(target)
+            return user.id
+        except:
+            return None
+    return None
+    
+
 async def send_premium_reminders(bot_instance, phdlust):
     while True:
         now = time.time()
