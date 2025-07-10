@@ -233,14 +233,14 @@ async def start_command(client: Client, message):
                 short_link = linkb
                 caption = "🔰 Yᴏᴜ Aʀᴇ Pʀᴇᴍɪᴜᴍ Uꜱᴇʀ ✅\nCʟɪᴄᴋ Bᴇʟᴏᴡ Bᴜᴛᴛᴏɴ Tᴏ Wᴀᴛᴄʜ Dɪʀᴇᴄᴛʟʏ"
                 button_text = "Cʟɪᴄᴋ Tᴏ Wᴀᴛᴄʜ"
+        
             else:
                 shortener_ids = ["myshortener1", "myshortener2", "myshortener3"]
                 phdlust_magic = random.choice(shortener_ids)
         
                 try:
                     user_id = message.from_user.id
-                    user_data = phdlust.find_one({"_id": user_id})  # ✅ No await for PyMongo
-                    count = user_data.get("short_count", 1) if user_data else 1
+                    count = await get_user_short_limit(user_id)  # ✅ Modular function used
         
                     short_link = linkb
                     for _ in range(count):
@@ -250,6 +250,7 @@ async def start_command(client: Client, message):
                     print("❌ Error:", e)
                     await message.reply_text("Short link failed. Contact @DshDm_bot")
                     return
+
 
             
             if not premium_status:
