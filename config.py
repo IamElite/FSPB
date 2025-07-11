@@ -57,6 +57,8 @@ SHORTLINK_API = os.environ.get("SHORTLINK_API", "7d14f3e827450b979c653d5fcae203b
 VERIFY_EXPIRE = int(os.environ.get('VERIFY_EXPIRE', 43200)) # Add time in seconds
 IS_VERIFY = os.environ.get("IS_VERIFY", "True")
 TUT_VID = os.environ.get("TUT_VID", "https://t.me/Phdlust_Premium_Proof/12")
+PR_MSG = os.environ.get("PR_MSG", "https://t.me/Phdlust_Premium_Proof/12")
+
 
 SHORTCAP = "<b>ᴄʟɪᴄᴋꜱ: {clicks}, 🔗 ʏσᴜʀ ʟɪηᴋ’ꜱ ʀєᴧᴅʏ 👇</b>" #token caption
 
