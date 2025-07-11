@@ -61,8 +61,8 @@ class Bot(Client):
             try:
                 logger_chat = await self.get_chat(LOG_ID)
                 startup_msg = await self.send_message(chat_id=logger_chat.id, text="<b>Bot has started!</b>")
-                self.LOGGER(__name__).info("Startup message sent to logger group")
-                await startup_msg.delete()
+                #self.LOGGER(__name__).info("Startup message sent to logger group")
+                #await startup_msg.delete()
             except Exception as ex:
                 self.LOGGER(__name__).warning(f"Failed to send startup message to logger group: {ex}")
 
