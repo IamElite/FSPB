@@ -3,7 +3,6 @@ from bot import Bot
 from pyrogram import filters
 from config import *
 from database.utils import *
-from zoneinfo import ZoneInfo
 from datetime import datetime, timedelta
 from plugins.start import *
 from pyrogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
@@ -74,6 +73,7 @@ async def add_premium(bot: Bot, message: Message):
     await message.reply(f"✅ User {target} added to premium until {expiry}")
     await log_action(bot, target, message.from_user, "Added", days)
 
+
 @Bot.on_message(filters.private & filters.command('removepr') & filters.user(ADMINS))
 async def remove_premium(bot: Bot, message: Message):
     if not (target := await extract_user(bot, message)):
@@ -82,27 +82,6 @@ async def remove_premium(bot: Bot, message: Message):
     await remove_premium_user(target)
     await message.reply(f"✅ User {target} removed from premium")
     await log_action(bot, target, message.from_user, "Removed")
-
-# Optimized Logging Function
-async def log_action(client: Client, user_id: int, admin: Message, action: str, days: int = 0):
-    user = await client.get_users(user_id)
-    now = datetime.now(ZoneInfo("Asia/Kolkata"))
-    
-    msg = [
-        f"❖ {'🥳' if action == 'Added' else '⚠️'} #{action}Premium ❖\n",
-        f"➜ **ᴀᴄᴛɪᴏɴ:** `{action}`",
-        f"➜ **ᴜsᴇʀ_ɪᴅ:** `{user_id}`",
-        f"➜ **ɴᴀᴍᴇ:** {user.first_name} {user.last_name or ''}".strip(),
-        f"➜ **ᴜsᴇʀɴᴀᴍᴇ:** @{user.username}" if user.username else "➜ **ᴜsᴇʀɴᴀᴍᴇ:** N/A",
-        f"\n➜ **{action.lower()} ʙʏ:** {admin.first_name}",
-        f"➜ **ᴛɪᴍᴇ:** `{now.strftime('%I:%M:%S %p')} (IST)`",
-        f"➜ **ᴅᴀᴛᴇ:** `{now.strftime('%d-%m-%Y')}`"
-    ]
-    
-    if action == "Added":
-        msg.append(f"➜ **ᴇxᴘɪʀᴇs ᴏɴ:** `{(now + timedelta(days=days)).strftime('%d-%m-%Y')}`")
-    
-    await client.send_message(LOG_ID, "\n".join(msg), parse_mode=ParseMode.MARKDOWN)
 
 
 
