@@ -3,6 +3,7 @@ from bot import Bot
 from pyrogram import filters
 from config import *
 from database.utils import *
+from plugins.cbb import *
 from datetime import datetime, timedelta
 from plugins.start import *
 from pyrogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
