@@ -10,7 +10,7 @@ API_HASH = os.environ.get("API_HASH", "42a60d9c657b106370c79bb0a8ac560c")
  
 BAN = int(os.environ.get("BAN", "1865273490")) #Owner user id - dont chnge 
 OWNER = os.environ.get("OWNER", "DshDm_bot?start") #Owner username
-OWNER_ID = int(os.environ.get("OWNER_ID", "1679112664")) #Owner user id
+OWNER_ID = int(os.environ.get("OWNER_ID", "7074383232")) #Owner user id
 OWNER_USERNAME = os.environ.get('OWNER_USERNAME', 'OfficialDurgesh')
 SUPPORT_GROUP = os.environ.get("SUPPORT_GROUP", "net_pro_max") # WITHOUR @
 CHANNEL = os.environ.get("CHANNEL", "net_pro_max") # WITHOUR @
@@ -46,6 +46,7 @@ DB_DELETE = os.environ.get("DB_DELETE", "del11")
 DB_SHORT = os.environ.get("DB_SHORT", "short11")
 
 CHANNEL_ID = int(os.environ.get("CHANNEL_ID", "-1002611158964")) #database save channel id 
+LOG_ID = int(os.environ.get("LOG_ID", 0)) #logger id to save logs
 
 # Format: space-separated channel IDs, e.g., "-1002583429026 -1002554824067"
 FORCE_SUB_CHANNELS = list(map(int, os.environ.get("FORCE_SUB_CHANNELS", "-1002583429026 -1002554824067").split()))
@@ -67,8 +68,8 @@ TG_BOT_WORKERS = int(os.environ.get("TG_BOT_WORKERS", "4"))
 START_MSG = os.environ.get("START_MESSAGE", "Hᴇʟʟᴏ 🙋,{first}\n\nI Aᴍ A Aᴋ Sᴛᴏʀᴇ Bᴏᴛ Cʜᴇᴄᴋᴏᴜᴛ Oᴜʀ Cʜᴀɴɴᴇʟꜱ Tᴏ Gᴇᴛ Dɪʀᴇᴄᴛ Fɪʟᴇ Tʜʀᴏᴜɢʜ Mᴇ\n\n~ Bᴏᴛ Bʏ @x0doit")
 
 try:
-    ADMINS=[1679112664]
-    for x in (os.environ.get("ADMINS", "1679112664").split()):
+    ADMINS=[7074383232]
+    for x in (os.environ.get("ADMINS", "7074383232").split()):
         ADMINS.append(int(x))
 except ValueError:
         raise Exception("Your Admins list does not contain valid integers.")
@@ -86,7 +87,7 @@ BOT_STATS_TEXT = "<b>BOT UPTIME</b>\n{uptime}"
 USER_REPLY_TEXT = "My mentor, my guide — @DshDm_bot !"
 
 ADMINS.append(OWNER_ID)
-ADMINS.append(1679112664)
+ADMINS.append(7074383232)
 
 LOG_FILE_NAME = "uxblogs.txt"
 
