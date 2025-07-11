@@ -4,8 +4,6 @@ from pyrogram import __version__, Client, filters
 from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
 from pyrogram.enums import ParseMode
 from database.database import full_userbase
-from datetime import datetime, timedelta
-from zoneinfo import ZoneInfo
 from bot import Bot
 from config import OWNER_ID, ADMINS, CHANNEL, SUPPORT_GROUP, OWNER
 from plugins.cmd import *
@@ -60,27 +58,4 @@ async def cb_handler(client: Bot, query: CallbackQuery):
             await query.message.reply_text(f"Shortened URL: {short_link}")
         except Exception as e:
             await query.message.reply_text(f"Error: {e}")
-
-
-# logs ------------------->
-
-async def log_action(client: Client, user_id: int, admin: Message, action: str, days: int = 0):
-    user = await client.get_users(user_id)
-    now = datetime.now(ZoneInfo("Asia/Kolkata"))
-    
-    msg = [
-        f"❖ {'🥳' if action == 'Added' else '⚠️'} #{action}Premium ❖\n",
-        f"➜ **ᴀᴄᴛɪᴏɴ:** `{action}`",
-        f"➜ **ᴜsᴇʀ_ɪᴅ:** `{user_id}`",
-        f"➜ **ɴᴀᴍᴇ:** {user.first_name} {user.last_name or ''}".strip(),
-        f"➜ **ᴜsᴇʀɴᴀᴍᴇ:** @{user.username}" if user.username else "➜ **ᴜsᴇʀɴᴀᴍᴇ:** N/A",
-        f"\n➜ **{action.lower()} ʙʏ:** {admin.first_name}",
-        f"➜ **ᴛɪᴍᴇ:** `{now.strftime('%I:%M:%S %p')} (IST)`",
-        f"➜ **ᴅᴀᴛᴇ:** `{now.strftime('%d-%m-%Y')}`"
-    ]
-    
-    if action == "Added":
-        msg.append(f"➜ **ᴇxᴘɪʀᴇs ᴏɴ:** `{(now + timedelta(days=days)).strftime('%d-%m-%Y')}`")
-    
-    await client.send_message(LOG_ID, "\n".join(msg), parse_mode=ParseMode.MARKDOWN)
 
