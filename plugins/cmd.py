@@ -33,7 +33,7 @@ async def handle_request(bot: Bot, message: Message):
             parse_mode=ParseMode.MARKDOWN)
 
         success = await message.reply(
-            "✨ **✨ ʀєǫᴜєꜱᴛ ꜱᴜʙϻɪᴛᴛєᴅ — ʏσᴜ'ʀє ση ʏσᴜʀ ᴡᴧʏ!\n🔔 ᴧᴄᴛɪση ᴄσϻᴘʟєᴛє. ꜱᴛᴧʏ ᴛᴜηєᴅ.**",
+            "**✨ ʀєǫᴜєꜱᴛ ꜱᴜʙϻɪᴛᴛєᴅ — ʏσᴜ'ʀє ση ʏσᴜʀ ᴡᴧʏ!\n🔔 ᴧᴄᴛɪση ᴄσϻᴘʟєᴛє. ꜱᴛᴧʏ ᴛᴜηєᴅ.**",
             parse_mode=ParseMode.MARKDOWN)
         await asyncio.sleep(60)
         await success.delete()
