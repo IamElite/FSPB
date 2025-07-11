@@ -73,7 +73,6 @@ async def add_premium(bot: Bot, message: Message):
     await message.reply(f"✅ User {target} added to premium until {expiry}")
     await log_action(bot, target, message.from_user, "Added", days)
 
-
 @Bot.on_message(filters.private & filters.command('removepr') & filters.user(ADMINS))
 async def remove_premium(bot: Bot, message: Message):
     if not (target := await extract_user(bot, message)):
