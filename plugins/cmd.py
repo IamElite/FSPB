@@ -10,6 +10,41 @@ from pyrogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineK
 from pyrogram.enums import ParseMode
 import time
 
+
+@Bot.on_message(filters.private & filters.command('request'))
+async def handle_request(bot: Bot, message: Message):
+    try:
+        # Premium Check (Single Line)
+        if not (await get_user_subscription(message.from_user.id))[0]:
+            return await message.reply(
+                "💎 **ᴘʀєϻɪᴜϻ ʀєǫᴜɪʀєᴅ**\nᴜᴘɢʀᴀᴅᴇ ᴛᴏ ᴜɴʟᴏᴄᴋ 🔒",
+                reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("🔓 ᴜɴʟᴏᴄᴋ", url=PR_MSG)]]),
+                parse_mode=ParseMode.MARKDOWN
+            )
+
+        # Request Validation (Compact)
+        if not (req_text := message.text.split(' ', 1)[1].strip()) if len(message.text.split()) > 1 else None:
+            return await message.reply("❌ **Usage:** `/request your_text`", parse_mode=ParseMode.MARKDOWN)
+
+        # Send to Log (Your Exact Format)
+        await bot.send_message(
+            LOG_ID,
+            f"✨ **#NᴇᴡPʀᴇᴍɪᴜᴍRᴇǫᴜᴇꜱᴛ** ✨\n\n"
+            f"📝 **ʀᴇǫᴜᴇꜱᴛ:**\n`{req_text.replace('`', '\\`')}`\n\n"
+            f"🔥 **ʀᴇǫᴜᴇꜱᴛᴇᴅ ʙʏ:** [{message.from_user.first_name}](tg://user?id={message.from_user.id})",
+            parse_mode=ParseMode.MARKDOWN
+        )
+
+        # Auto-Delete Success Msg
+        success = await message.reply("✅ **Rᴇǫᴜᴇꜱᴛ ꜱᴜʙᴍɪᴛᴛᴇᴅ!**")
+        await asyncio.sleep(30)
+        await success.delete()
+
+    except Exception as e:
+        await message.reply(f"⚠️ **Error:** `{e}`", parse_mode=ParseMode.MARKDOWN)
+
+
+
 # /help command to show available commands
 @Bot.on_message(filters.private & filters.command('help') & filters.user(ADMINS))
 async def help_command(bot: Bot, message: Message):
