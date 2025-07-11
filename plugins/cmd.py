@@ -123,23 +123,23 @@ async def send_log_to_group(client: Client, user_id: int, admin_user: Message, a
 
         log_message = (
             f"{header}"
-            f"⟶ ᴀᴄᴛɪᴏɴ: #{action}\n"
+            f"⟶ ᴀᴄᴛɪᴏɴ: {action}\n"
             f"⟶ ᴜsᴇʀ_ɪᴅ: `{user_id}`\n"
-            f"⟶ ɴᴀᴍᴇ: `{user_name}`\n"
-            f"⟶ ᴜsᴇʀɴᴀᴍᴇ: `{user_username}`\n"
+            f"⟶ ɴᴀᴍᴇ: {user_name}\n"
+            f"⟶ ᴜsᴇʀɴᴀᴍᴇ: {user_username}\n\n"
         )
 
         if action == "Added":
-            action_by = f"⟶ ᴀᴅᴅᴇᴅ ʙʏ: `{admin_first_name}`\n"
-            additional_info = f"⟶ ᴇxᴘɪʀᴇs ᴏɴ: `{(current_date + timedelta(days=days)).strftime('%d-%m-%Y')}`\n"
+            action_by = f"⟶ ᴀᴅᴅᴇᴅ ʙʏ: {admin_first_name}\n"
+            additional_info = f"⟶ ᴇxᴘɪʀᴇs ᴏɴ: {(current_date + timedelta(days=days)).strftime('%d-%m-%Y')}\n"
         else:
-            action_by = f"⟶ ʀᴇᴍᴏᴠᴇᴅ ʙʏ: `{admin_first_name}`\n"
+            action_by = f"⟶ ʀᴇᴍᴏᴠᴇᴅ ʙʏ: {admin_first_name}\n"
             additional_info = ""
 
         log_message += (
             f"{action_by}"
-            f"⟶ ᴅᴀᴛᴇ: `{formatted_date}`\n"
-            f"⟶ ᴛɪᴍᴇ: `{formatted_time}`\n"
+            f"⟶ ᴅᴀᴛᴇ: {formatted_date}\n"
+            f"⟶ ᴛɪᴍᴇ: {formatted_time}\n"
             f"{additional_info}"
         )
 
