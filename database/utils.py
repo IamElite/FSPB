@@ -1,4 +1,5 @@
-from pyrogram import Client, Message
+from pyrogram import Client
+from pyrogram.types import Message
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 import asyncio, time
