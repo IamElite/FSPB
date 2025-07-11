@@ -14,7 +14,7 @@ import time
 @Bot.on_message(filters.private & filters.command('request'))
 async def handle_request(bot: Bot, message: Message):
     try:
-        # Premium Check (One-Liner)
+        # Premium Check (Markdown needed for bold text and button)
         if not (await get_user_subscription(message.from_user.id))[0]:
             return await message.reply(
                 "💎 **ᴘʀєϻɪᴜϻ ʀєǫᴜɪʀєᴅ**\nᴜᴘɢʀᴀᴅᴇ ᴛᴏ ᴜɴʟᴏᴄᴋ 🔒",
@@ -22,30 +22,38 @@ async def handle_request(bot: Bot, message: Message):
                 parse_mode=ParseMode.MARKDOWN
             )
 
-        # Extract & Validate Request (Fixed Variable Assignment)
+        # Extract Request (No markdown needed for plain error messages)
         if len(message.text.split()) < 2:
-            return await message.reply("❌ **Usage:** `/request your_text`", parse_mode=ParseMode.MARKDOWN)
+            return await message.reply("❌ Usage: /request your_text")  # Plain text
 
         req_text = message.text.split(' ', 1)[1].strip()
         if not req_text:
-            return await message.reply("❌ Request text cannot be empty!", parse_mode=ParseMode.MARKDOWN)
+            return await message.reply("❌ Request text cannot be empty!")  # Plain text
 
-        # Send to Log (Your Exact Format)
-        await bot.send_message(
-            LOG_ID,
-            f"✨ **#NᴇᴡPʀᴇᴍɪᴜᴍRᴇǫᴜᴇꜱᴛ** ✨\n\n"
-            f"📝 **ʀᴇǫᴜᴇꜱᴛ:**\n`{req_text.replace('`', '\\`')}`\n\n"
-            f"🔥 **ʀᴇǫᴜᴇꜱᴛᴇᴅ ʙʏ:** [{message.from_user.first_name}](tg://user?id={message.from_user.id})",
-            parse_mode=ParseMode.MARKDOWN
+        # Prepare Log Message (Markdown needed)
+        current_date = datetime.now().strftime("%d-%m-%Y")
+        log_msg = (
+            f"✨ **#NᴇᴡPʀᴇᴍɪᴜᴍRᴇǫᴜᴇꜱᴛ** - {current_date} ✨\n\n"
+            f"📝 **ʀᴇǫᴜᴇꜱᴛ:**\n{req_text.replace('`', '\\`')}\n\n"
+            f"🔥 **ʀᴇǫᴜᴇꜱᴛᴇᴅ ʙʏ:** [{message.from_user.first_name}](tg://user?id={message.from_user.id})"
         )
 
-        # Auto-Delete Success Msg
-        success = await message.reply("✅ **Rᴇǫᴜᴇꜱᴛ ꜱᴜʙᴍɪᴛᴛᴇᴅ!**")
-        await asyncio.sleep(30)
+        await bot.send_message(
+            LOG_ID,
+            log_msg,
+            parse_mode=ParseMode.MARKDOWN  # Markdown for rich formatting
+        )
+
+        # Success Message (Markdown optional - using for consistency)
+        success = await message.reply(
+            "✨ **Request submitted — you're on your way!\n🔔 Action complete. Stay tuned.**",
+            parse_mode=ParseMode.MARKDOWN
+        )
+        await asyncio.sleep(60)
         await success.delete()
 
     except Exception as e:
-        await message.reply(f"⚠️ **Error:** `{e}`", parse_mode=ParseMode.MARKDOWN)
+        await message.reply(f"⚠️ Error: {str(e)}")  # Plain text error
 
 
 
