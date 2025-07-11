@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 import asyncio, time
 from bot import Bot as bot
+from config import *
 
 
 async def extract_user(bot, message):
