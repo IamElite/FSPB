@@ -104,54 +104,40 @@ async def remove_premium(bot: Bot, message: Message):
         "Removed"
     )
 
-
-
-async def send_log_to_group(client: Client, user_id: int, admin_user: Message, action: str, days: int = 0, expiry_date: datetime = None):
-    action_emoji = "🥳" if action == "Added" else "⚠️"
-    header = f"❖ {action_emoji} **#{action}Premium** ❖\n\n"
-
-    user_info = await client.get_users(user_id)
-    user_first_name = user_info.first_name
-    user_last_name = user_info.last_name if user_info.last_name else ""
-    user_name = f"{user_first_name} {user_last_name}" if user_last_name else user_first_name
-    user_username = f"@{user_info.username}" if user_info.username else "N/A"
-    admin_first_name = admin_user.first_name
-    admin_username = admin_user.username if admin_user.username else admin_user.first_name
-
-    # Get current time in IST (12-hour format)
-    ist = ZoneInfo("Asia/Kolkata")
-    current_date = datetime.now(ist)
-    formatted_date = current_date.strftime("%d-%m-%Y")
-    formatted_time = current_date.strftime("%I:%M:%S %p")  # 12-hour format (e.g., 02:30:45 PM)
-
-    log_message = (
+async def send_log_to_group(client: Client, user_id: int, admin_user: Message, action: str, days: int = 0):
+    # Emoji and header
+    emoji = "🥳" if action == "Added" else "⚠️"
+    header = f"❖ {emoji} #{action}Premium ❖\n\n"
+    
+    # User info
+    user = await client.get_users(user_id)
+    name = f"{user.first_name} {user.last_name}" if user.last_name else user.first_name
+    username = f"@{user.username}" if user.username else "N/A"
+    
+    # Time formatting (IST 12-hour)
+    now = datetime.now(ZoneInfo("Asia/Kolkata"))
+    time_str = now.strftime("%I:%M:%S %p (IST)")
+    date_str = now.strftime("%d-%m-%Y")
+    
+    # Message construction
+    log_msg = (
         f"{header}"
         f"➜ **ᴀᴄᴛɪᴏɴ:** `{action}`\n"
         f"➜ **ᴜsᴇʀ_ɪᴅ:** `{user_id}`\n"
-        f"➜ **ɴᴀᴍᴇ:** {user_name}\n"
-        f"➜ **ᴜsᴇʀɴᴀᴍᴇ:** {user_username}\n\n"
+        f"➜ **ɴᴀᴍᴇ:** {name}\n"
+        f"➜ **ᴜsᴇʀɴᴀᴍᴇ:** {username}\n\n"
+        f"➜ **{'ᴀᴅᴅᴇᴅ' if action == 'Added' else 'ʀᴇᴍᴏᴠᴇᴅ'} ʙʏ:** {admin_user.first_name}\n"
+        f"➜ **ᴛɪᴍᴇ:** `{time_str}`\n"
+        f"➜ **ᴅᴀᴛᴇ:** `{date_str}`"
     )
-
+    
+    # Add expiry if added
     if action == "Added":
-        action_by = f"➜ **ᴀᴅᴅᴇᴅ ʙʏ:** {admin_first_name}\n"
-        expiry_date_ist = (current_date + timedelta(days=days)).strftime('%d-%m-%Y')
-        additional_info = f"➜ **ᴇxᴘɪʀᴇs ᴏɴ:** `{expiry_date_ist}`\n"
-    else:
-        action_by = f"➜ **ʀᴇᴍᴏᴠᴇᴅ ʙʏ:** {admin_first_name}\n"
-        additional_info = ""
-
-    log_message += (
-        f"{action_by}"
-        f"➜ **ᴅᴀᴛᴇ:** {formatted_date}\n"
-        f"➜ **ᴛɪᴍᴇ:** {formatted_time}\n"  # e.g., "02:30:45 PM (IST)"
-        f"{additional_info}"
-    )
-
-    try:
-        await client.send_message(LOG_ID, log_message, parse_mode=ParseMode.MARKDOWN)
-    except Exception as e:
-        print(f"Failed to send log message to LOG_ID: {e}")
-
+        expiry = (now + timedelta(days=days)).strftime('%d-%m-%Y')
+        log_msg += f"\n➜ **ᴇxᴘɪʀᴇs ᴏɴ:** `{expiry}`"
+    
+    # Send message
+    await client.send_message(LOG_ID, log_msg, parse_mode=ParseMode.MARKDOWN)
 
 
 @Bot.on_message(filters.command('myplan') & filters.private)
