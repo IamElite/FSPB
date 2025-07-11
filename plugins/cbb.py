@@ -84,4 +84,3 @@ async def log_action(client: Client, user_id: int, admin: Message, action: str, 
     
     await client.send_message(LOG_ID, "\n".join(msg), parse_mode=ParseMode.MARKDOWN)
 
-
