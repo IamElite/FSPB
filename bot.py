@@ -7,7 +7,7 @@ from pyrogram import Client
 from pyrogram.enums import ParseMode
 import sys
 from datetime import datetime
-from config import API_HASH, APP_ID, LOGGER, TG_BOT_TOKEN, TG_BOT_WORKERS, FORCE_SUB_CHANNELS, CHANNEL_ID, PORT
+from config import API_HASH, APP_ID, LOGGER, TG_BOT_TOKEN, TG_BOT_WORKERS, FORCE_SUB_CHANNELS, CHANNEL_ID, PORT, LOG_ID
 import pyrogram.utils
 
 pyrogram.utils.MIN_CHAT_ID = -999999999999
@@ -56,6 +56,16 @@ class Bot(Client):
             self.db_channel = db_channel
             test = await self.send_message(chat_id = db_channel.id, text = "Test Message")
             await test.delete()
+
+            # Send message to logger group
+            try:
+                logger_chat = await self.get_chat(LOG_ID)
+                startup_msg = await self.send_message(chat_id=logger_chat.id, text="<b>Bot has started!</b>")
+                self.LOGGER(__name__).info("Startup message sent to logger group")
+                await startup_msg.delete()
+            except Exception as ex:
+                self.LOGGER(__name__).warning(f"Failed to send startup message to logger group: {ex}")
+
         except Exception as e:
             self.LOGGER(__name__).warning(e)
             self.LOGGER(__name__).warning(f"Make Sure bot is Admin in DB Channel, and Double check the CHANNEL_ID Value, Current Value {CHANNEL_ID}")
