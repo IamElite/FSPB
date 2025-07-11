@@ -3,11 +3,12 @@ from bot import Bot
 from pyrogram import filters
 from config import *
 from database.utils import *
+from zoneinfo import ZoneInfo
 from datetime import datetime, timedelta
 from plugins.start import *
 from pyrogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
 from pyrogram.enums import ParseMode
-import time, pytz
+import time
 
 # /help command to show available commands
 @Bot.on_message(filters.private & filters.command('help') & filters.user(ADMINS))
@@ -104,6 +105,7 @@ async def remove_premium(bot: Bot, message: Message):
     )
 
 
+
 async def send_log_to_group(client: Client, user_id: int, admin_user: Message, action: str, days: int = 0, expiry_date: datetime = None):
     action_emoji = "🥳" if action == "Added" else "⚠️"
     header = f"❖ {action_emoji} **#{action}Premium** ❖\n\n"
@@ -116,8 +118,8 @@ async def send_log_to_group(client: Client, user_id: int, admin_user: Message, a
     admin_first_name = admin_user.first_name
     admin_username = admin_user.username if admin_user.username else admin_user.first_name
 
-    # Get current time in Indian Standard Time (IST)
-    ist = pytz.timezone('Asia/Kolkata')
+    # Get current time in Indian Standard Time (IST) using zoneinfo
+    ist = ZoneInfo("Asia/Kolkata")
     current_date = datetime.now(ist)
     formatted_date = current_date.strftime("%d-%m-%Y")
     formatted_time = current_date.strftime("%H:%M:%S")
@@ -140,8 +142,8 @@ async def send_log_to_group(client: Client, user_id: int, admin_user: Message, a
 
     log_message += (
         f"{action_by}"
-        f"➜ **ᴅᴀᴛᴇ:** {formatted_date}\n"
-        f"➜ **ᴛɪᴍᴇ:** {formatted_time}\n"  # Mentioning IST for clarity
+        f"➜ **ᴅᴀᴛᴇ:** `{formatted_date}`\n"
+        f"➜ **ᴛɪᴍᴇ:** `{formatted_time} (IST)`\n"
         f"{additional_info}"
     )
 
@@ -149,7 +151,6 @@ async def send_log_to_group(client: Client, user_id: int, admin_user: Message, a
         await client.send_message(LOG_ID, log_message, parse_mode=ParseMode.MARKDOWN)
     except Exception as e:
         print(f"Failed to send log message to LOG_ID: {e}")
-
 
 
 
