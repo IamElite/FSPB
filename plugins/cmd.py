@@ -118,11 +118,11 @@ async def send_log_to_group(client: Client, user_id: int, admin_user: Message, a
     admin_first_name = admin_user.first_name
     admin_username = admin_user.username if admin_user.username else admin_user.first_name
 
-    # Get current time in Indian Standard Time (IST) using zoneinfo
+    # Get current time in IST (12-hour format)
     ist = ZoneInfo("Asia/Kolkata")
     current_date = datetime.now(ist)
     formatted_date = current_date.strftime("%d-%m-%Y")
-    formatted_time = current_date.strftime("%H:%M:%S")
+    formatted_time = current_date.strftime("%I:%M:%S %p")  # 12-hour format (e.g., 02:30:45 PM)
 
     log_message = (
         f"{header}"
@@ -142,8 +142,8 @@ async def send_log_to_group(client: Client, user_id: int, admin_user: Message, a
 
     log_message += (
         f"{action_by}"
-        f"➜ **ᴅᴀᴛᴇ:** `{formatted_date}`\n"
-        f"➜ **ᴛɪᴍᴇ:** `{formatted_time} (IST)`\n"
+        f"➜ **ᴅᴀᴛᴇ:** {formatted_date}\n"
+        f"➜ **ᴛɪᴍᴇ:** {formatted_time}\n"  # e.g., "02:30:45 PM (IST)"
         f"{additional_info}"
     )
 
