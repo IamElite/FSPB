@@ -14,7 +14,7 @@ import time
 @Bot.on_message(filters.private & filters.command('request'))
 async def handle_request(bot: Bot, message: Message):
     try:
-        # Premium Check (Single Line)
+        # Premium Check (One-Liner)
         if not (await get_user_subscription(message.from_user.id))[0]:
             return await message.reply(
                 "💎 **ᴘʀєϻɪᴜϻ ʀєǫᴜɪʀєᴅ**\nᴜᴘɢʀᴀᴅᴇ ᴛᴏ ᴜɴʟᴏᴄᴋ 🔒",
@@ -22,9 +22,13 @@ async def handle_request(bot: Bot, message: Message):
                 parse_mode=ParseMode.MARKDOWN
             )
 
-        # Request Validation (Compact)
-        if not (req_text := message.text.split(' ', 1)[1].strip()) if len(message.text.split()) > 1 else None:
+        # Extract & Validate Request (Fixed Variable Assignment)
+        if len(message.text.split()) < 2:
             return await message.reply("❌ **Usage:** `/request your_text`", parse_mode=ParseMode.MARKDOWN)
+
+        req_text = message.text.split(' ', 1)[1].strip()
+        if not req_text:
+            return await message.reply("❌ Request text cannot be empty!", parse_mode=ParseMode.MARKDOWN)
 
         # Send to Log (Your Exact Format)
         await bot.send_message(
