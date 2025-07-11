@@ -58,86 +58,52 @@ async def set_or_get_short_count(client, message):
             f"⚠️ Usage: /settime 1\n\nℹ️ Current active: {count}x"
         )
 
-# ✅ Updated /addpr command to support ID/username/reply
+# Premium Management Commands
 @Bot.on_message(filters.private & filters.command('addpr') & filters.user(ADMINS))
 async def add_premium(bot: Bot, message: Message):
-    target_user_id = await extract_user(bot, message)
-    args = message.text.split()
-
-    if not target_user_id:
+    if not (target := await extract_user(bot, message)):
         return await message.reply("❌ Invalid user. Use ID, username, or reply to user.")
-    if len(args) < 3 or not args[2].isdigit():
+    
+    try:
+        days = int(message.text.split()[2])
+    except (IndexError, ValueError):
         return await message.reply("Usage: /addpr user duration_in_days")
 
-    duration_in_days = int(args[2])
-    await add_premium_user(target_user_id, duration_in_days)
-    current_date = datetime.now()
-    await message.reply(f"✅ User {target_user_id} added to premium for {duration_in_days} days.")
-    
-    # Log premium user addition to logger group
-    await send_log_to_group(
-        client=bot,
-        user_id=target_user_id,
-        admin_user=message.from_user,
-        action="Added",
-        days=duration_in_days,
-        expiry_date=current_date + timedelta(days=duration_in_days)
-    )
+    await add_premium_user(target, days)
+    expiry = (datetime.now() + timedelta(days=days)).strftime('%d-%m-%Y')
+    await message.reply(f"✅ User {target} added to premium until {expiry}")
+    await log_action(bot, target, message.from_user, "Added", days)
 
-
-# ✅ Updated /removepr command to support ID/username/reply
 @Bot.on_message(filters.private & filters.command('removepr') & filters.user(ADMINS))
 async def remove_premium(bot: Bot, message: Message):
-    target_user_id = await extract_user(bot, message)
-    if not target_user_id:
+    if not (target := await extract_user(bot, message)):
         return await message.reply("❌ Invalid user. Use ID, username, or reply to user.")
-
-    # Remove premium from target user
-    await remove_premium_user(target_user_id)
-    await message.reply(f"✅ User {target_user_id} removed from premium.")
-
-    # Log premium user removal to logger group
-    await send_log_to_group(
-        bot,
-        target_user_id,
-        message.from_user,
-        "Removed"
-    )
-
-async def send_log_to_group(client: Client, user_id: int, admin_user: Message, action: str, days: int = 0):
-    # Emoji and header
-    emoji = "🥳" if action == "Added" else "⚠️"
-    header = f"❖ {emoji} #{action}Premium ❖\n\n"
     
-    # User info
+    await remove_premium_user(target)
+    await message.reply(f"✅ User {target} removed from premium")
+    await log_action(bot, target, message.from_user, "Removed")
+
+# Optimized Logging Function
+async def log_action(client: Client, user_id: int, admin: Message, action: str, days: int = 0):
     user = await client.get_users(user_id)
-    name = f"{user.first_name} {user.last_name}" if user.last_name else user.first_name
-    username = f"@{user.username}" if user.username else "N/A"
-    
-    # Time formatting (IST 12-hour)
     now = datetime.now(ZoneInfo("Asia/Kolkata"))
-    time_str = now.strftime("%I:%M:%S %p (IST)")
-    date_str = now.strftime("%d-%m-%Y")
     
-    # Message construction
-    log_msg = (
-        f"{header}"
-        f"➜ **ᴀᴄᴛɪᴏɴ:** `{action}`\n"
-        f"➜ **ᴜsᴇʀ_ɪᴅ:** `{user_id}`\n"
-        f"➜ **ɴᴀᴍᴇ:** {name}\n"
-        f"➜ **ᴜsᴇʀɴᴀᴍᴇ:** {username}\n\n"
-        f"➜ **{'ᴀᴅᴅᴇᴅ' if action == 'Added' else 'ʀᴇᴍᴏᴠᴇᴅ'} ʙʏ:** {admin_user.first_name}\n"
-        f"➜ **ᴛɪᴍᴇ:** `{time_str}`\n"
-        f"➜ **ᴅᴀᴛᴇ:** `{date_str}`"
-    )
+    msg = [
+        f"❖ {'🥳' if action == 'Added' else '⚠️'} #{action}Premium ❖\n",
+        f"➜ **ᴀᴄᴛɪᴏɴ:** `{action}`",
+        f"➜ **ᴜsᴇʀ_ɪᴅ:** `{user_id}`",
+        f"➜ **ɴᴀᴍᴇ:** {user.first_name} {user.last_name or ''}".strip(),
+        f"➜ **ᴜsᴇʀɴᴀᴍᴇ:** @{user.username}" if user.username else "➜ **ᴜsᴇʀɴᴀᴍᴇ:** N/A",
+        f"\n➜ **{action.lower()} ʙʏ:** {admin.first_name}",
+        f"➜ **ᴛɪᴍᴇ:** `{now.strftime('%I:%M:%S %p')} (IST)`",
+        f"➜ **ᴅᴀᴛᴇ:** `{now.strftime('%d-%m-%Y')}`"
+    ]
     
-    # Add expiry if added
     if action == "Added":
-        expiry = (now + timedelta(days=days)).strftime('%d-%m-%Y')
-        log_msg += f"\n➜ **ᴇxᴘɪʀᴇs ᴏɴ:** `{expiry}`"
+        msg.append(f"➜ **ᴇxᴘɪʀᴇs ᴏɴ:** `{(now + timedelta(days=days)).strftime('%d-%m-%Y')}`")
     
-    # Send message
-    await client.send_message(LOG_ID, log_msg, parse_mode=ParseMode.MARKDOWN)
+    await client.send_message(LOG_ID, "\n".join(msg), parse_mode=ParseMode.MARKDOWN)
+
 
 
 @Bot.on_message(filters.command('myplan') & filters.private)
