@@ -106,47 +106,48 @@ async def remove_premium(bot: Bot, message: Message):
 
 async def send_log_to_group(client: Client, user_id: int, admin_user: Message, action: str, days: int = 0, expiry_date: datetime = None):
 
-action_emoji = "🥳" if action == "Added" else "⚠️"
-header = f"❖ {action_emoji} #{action}Premium ❖\n\n"
+        action_emoji = "🥳" if action == "Added" else "⚠️"
+        header = f"❖ {action_emoji} #{action}Premium ❖\n\n"
 
-user_info = await client.get_users(user_id)
-user_first_name = user_info.first_name
-user_last_name = user_info.last_name if user_info.last_name else ""
-user_name = f"{user_first_name} {user_last_name}" if user_last_name else user_first_name
-user_username = f"@{user_info.username}" if user_info.username else "N/A"
-admin_first_name = admin_user.first_name
-admin_username = admin_user.username if admin_user.username else admin_user.first_name
+        user_info = await client.get_users(user_id)
+        user_first_name = user_info.first_name
+        user_last_name = user_info.last_name if user_info.last_name else ""
+        user_name = f"{user_first_name} {user_last_name}" if user_last_name else user_first_name
+        user_username = f"@{user_info.username}" if user_info.username else "N/A"
+        admin_first_name = admin_user.first_name
+        admin_username = admin_user.username if admin_user.username else admin_user.first_name
 
-current_date = datetime.now()
-formatted_date = current_date.strftime("%d-%m-%Y")
-formatted_time = current_date.strftime("%H:%M:%S")
+        current_date = datetime.now()
+        formatted_date = current_date.strftime("%d-%m-%Y")
+        formatted_time = current_date.strftime("%H:%M:%S")
 
-log_message = (
-    f"{header}"
-    f"⟶ ᴀᴄᴛɪᴏɴ: #{action}\n"
-    f"⟶ ᴜsᴇʀ_ɪᴅ: `{user_id}`\n"
-    f"⟶ ɴᴀᴍᴇ: `{user_name}`\n"
-    f"⟶ ᴜsᴇʀɴᴀᴍᴇ: `{user_username}`\n"
-)
+        log_message = (
+            f"{header}"
+            f"⟶ ᴀᴄᴛɪᴏɴ: #{action}\n"
+            f"⟶ ᴜsᴇʀ_ɪᴅ: `{user_id}`\n"
+            f"⟶ ɴᴀᴍᴇ: `{user_name}`\n"
+            f"⟶ ᴜsᴇʀɴᴀᴍᴇ: `{user_username}`\n"
+        )
 
-if action == "Added":
-    action_by = f"⟶ ᴀᴅᴅᴇᴅ ʙʏ: `{admin_first_name}`\n"
-    additional_info = f"⟶ ᴇxᴘɪʀᴇs ᴏɴ: `{(current_date + timedelta(days=days)).strftime('%d-%m-%Y')}`\n"
-else:
-    action_by = f"⟶ ʀᴇᴍᴏᴠᴇᴅ ʙʏ: `{admin_first_name}`\n"
-    additional_info = ""
+        if action == "Added":
+            action_by = f"⟶ ᴀᴅᴅᴇᴅ ʙʏ: `{admin_first_name}`\n"
+            additional_info = f"⟶ ᴇxᴘɪʀᴇs ᴏɴ: `{(current_date + timedelta(days=days)).strftime('%d-%m-%Y')}`\n"
+        else:
+            action_by = f"⟶ ʀᴇᴍᴏᴠᴇᴅ ʙʏ: `{admin_first_name}`\n"
+            additional_info = ""
 
-log_message += (
-    f"{action_by}"
-    f"⟶ ᴅᴀᴛᴇ: `{formatted_date}`\n"
-    f"⟶ ᴛɪᴍᴇ: `{formatted_time}`\n"
-    f"{additional_info}"
-)
+        log_message += (
+            f"{action_by}"
+            f"⟶ ᴅᴀᴛᴇ: `{formatted_date}`\n"
+            f"⟶ ᴛɪᴍᴇ: `{formatted_time}`\n"
+            f"{additional_info}"
+        )
 
-try:
-    await client.send_message(LOG_ID, log_message, parse_mode=ParseMode.MARKDOWN)
-except Exception as e:
-    print(f"Failed to send log message to LOG_ID: {e}")
+        try:
+            await client.send_message(LOG_ID, log_message, parse_mode=ParseMode.MARKDOWN)
+        except Exception as e:
+            print(f"Failed to send log message to LOG_ID: {e}")
+
 
 
 
