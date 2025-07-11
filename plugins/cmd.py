@@ -3,11 +3,11 @@ from bot import Bot
 from pyrogram import filters
 from config import *
 from database.utils import *
-from datetime import datetime
+from datetime import datetime, timedelta
 from plugins.start import *
 from pyrogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
 from pyrogram.enums import ParseMode
-import time
+import time, pytz
 
 # /help command to show available commands
 @Bot.on_message(filters.private & filters.command('help') & filters.user(ADMINS))
@@ -116,13 +116,15 @@ async def send_log_to_group(client: Client, user_id: int, admin_user: Message, a
     admin_first_name = admin_user.first_name
     admin_username = admin_user.username if admin_user.username else admin_user.first_name
 
-    current_date = datetime.now()
+    # Get current time in Indian Standard Time (IST)
+    ist = pytz.timezone('Asia/Kolkata')
+    current_date = datetime.now(ist)
     formatted_date = current_date.strftime("%d-%m-%Y")
     formatted_time = current_date.strftime("%H:%M:%S")
 
     log_message = (
         f"{header}"
-        f"➜ **ᴀᴄᴛɪᴏɴ:** {action}\n"
+        f"➜ **ᴀᴄᴛɪᴏɴ:** `{action}`\n"
         f"➜ **ᴜsᴇʀ_ɪᴅ:** `{user_id}`\n"
         f"➜ **ɴᴀᴍᴇ:** {user_name}\n"
         f"➜ **ᴜsᴇʀɴᴀᴍᴇ:** {user_username}\n\n"
@@ -130,15 +132,16 @@ async def send_log_to_group(client: Client, user_id: int, admin_user: Message, a
 
     if action == "Added":
         action_by = f"➜ **ᴀᴅᴅᴇᴅ ʙʏ:** {admin_first_name}\n"
-        additional_info = f"➜ **ᴇxᴘɪʀᴇs ᴏɴ:** `{(current_date + timedelta(days=days)).strftime('%d-%m-%Y')}`\n"
+        expiry_date_ist = (current_date + timedelta(days=days)).strftime('%d-%m-%Y')
+        additional_info = f"➜ **ᴇxᴘɪʀᴇs ᴏɴ:** `{expiry_date_ist}`\n"
     else:
         action_by = f"➜ **ʀᴇᴍᴏᴠᴇᴅ ʙʏ:** {admin_first_name}\n"
         additional_info = ""
 
     log_message += (
         f"{action_by}"
-        f"➜ **ᴅᴀᴛᴇ:** `{formatted_date}`\n"
-        f"➜ **ᴛɪᴍᴇ:** `{formatted_time}`\n"
+        f"➜ **ᴅᴀᴛᴇ:** {formatted_date}\n"
+        f"➜ **ᴛɪᴍᴇ:** {formatted_time}\n"  # Mentioning IST for clarity
         f"{additional_info}"
     )
 
@@ -146,7 +149,6 @@ async def send_log_to_group(client: Client, user_id: int, admin_user: Message, a
         await client.send_message(LOG_ID, log_message, parse_mode=ParseMode.MARKDOWN)
     except Exception as e:
         print(f"Failed to send log message to LOG_ID: {e}")
-
 
 
 
