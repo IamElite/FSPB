@@ -12,8 +12,7 @@ from helper_func import *
 from plugins.start import *
 #from plugins.cmd import *
 
-@Bot.on_message(filters.private & filters.user(ADMINS) & ~filters.command(['start', 'users','addshort','resetshort','seeshort', 'getpremiumusers' , 'broadcast', 'batch', 'genlink', 'upi', 'myplan', 'plans', 'stats', 'removepr', 'addpr', 'st', 'settime']))
-#@Bot.on_message(filters.private & filters.user(ADMINS) & ~filters.command(['start','users','broadcast','batch','genlink','stats']))
+@Bot.on_message(filters.private & filters.user(ADMINS) & (~filters.text | (filters.text & ~filters.regex(r'^/'))))
 async def channel_post(client: Client, message: Message):
     reply_text = await message.reply_text("Please wait...", quote=True)
     
