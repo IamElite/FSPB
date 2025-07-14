@@ -216,77 +216,74 @@ async def start_command(client: Client, message):
 
     premium_status = await is_premium_user(user_id)
 
-    if len(message.text) > 7:
-        base64_string = message.text.split(" ", 1)[1]
-        is_premium_link = False
-        is_vip2_link = False
+    if len(message.text) <= 7:
+        return  # No link provided, handle basic start command elsewhere
 
-        try:
-            decoded_string = await decode_premium(base64_string)
-            is_premium_link = True
-            if "vip2-" in decoded_string:
-                is_vip2_link = True
-        except Exception as e:
-            try:
-                decoded_string = await decode(base64_string)
-            except Exception as e:
-                await message.reply_text("Invalid link provided. \n\nGet help /upi")
-                return
+    base64_string = message.text.split(" ", 1)[1]
+    is_vip2_link = False
 
-        if "vip-" in decoded_string or "vip2-" in decoded_string:
-            normal_link = decoded_string.replace("vip-", "get-").replace("vip2-", "get-")
-            phdlust_code = await encode(normal_link)
-            linkb = f"https://t.me/{client.username}?start={phdlust_code}"
-        
-            if premium_status:  # Premium users get direct link
-                short_link = linkb
-                caption = "🔰 Yᴏᴜ Aʀᴇ Pʀᴇᴍɪᴜᴍ Uꜱᴇʀ ✅\nCʟɪᴄᴋ Bᴇʟᴏᴡ Bᴜᴛᴛᴏɴ Tᴏ Wᴀᴛᴄʜ Dɪʀᴇᴄᴛʟʏ"
-                button_text = "🎯 Dɪʀᴇᴄᴛ Lɪɴᴋ"
-                
-                buttons = [
-                    [InlineKeyboardButton(button_text, url=short_link)],
-                    [InlineKeyboardButton("∘ ᴘʀєϻɪᴜϻ ∘", callback_data="upi_info")]
-                ]
-            else:  # Non-premium users (both VIP and VIP2)
-                if is_vip2_link:
-                    try:
-                        count = await get_user_short_limit(user_id)
-                        short_link = linkb
-                        for _ in range(count):
-                            short_link = await get_shortlink(SHORTLINK_URL, SHORTLINK_API, short_link)
-                    except Exception as e:
-                        print("❌ Vip2 Shortener Error:", e)
-                        await message.reply_text("Vip2 link service down. Contact admin")
-                        return
-                else:
-                    shortener_ids = ["myshortener1", "myshortener2", "myshortener3"]
-                    phdlust_magic = random.choice(shortener_ids)
-                    try:
-                        count = await get_user_short_limit(user_id)
-                        short_link = linkb
-                        for _ in range(count):
-                            short_link = await get_shortlink(phdlust_magic, short_link)
-                    except Exception as e:
-                        print("❌ Error:", e)
-                        await message.reply_text("Short link failed. Contact @DshDm_bot")
-                        return
+    try:
+        decoded_string = await decode(base64_string)
+        if "vip2-" in decoded_string:
+            is_vip2_link = True
+    except Exception as e:
+        await message.reply_text("Invalid link provided.\n\nGet help /upi")
+        return
 
-                clicks = await increment_and_get_clicks(phdlust_magic)
-                caption = SHORTCAP.format(clicks=clicks)
-                button_text = "∙ ꜱʜσʀᴛ ʟɪηᴋ ∙"
-                
-                buttons = [
-                    [InlineKeyboardButton(button_text, url=short_link),
-                     InlineKeyboardButton("∙ ᴛᴜᴛσʀɪᴧʟ ᴠɪᴅ ∙", url=TUT_VID)],
-                    [InlineKeyboardButton("∘ ᴘʀєϻɪᴜϻ ∘", callback_data="upi_info")]
-                ]
-        
+    if "vip-" in decoded_string or "vip2-" in decoded_string:
+        normal_link = decoded_string.replace("vip-", "get-").replace("vip2-", "get-")
+        phdlust_code = await encode(normal_link)
+        linkb = f"https://t.me/{client.username}?start={phdlust_code}"
+    
+        if premium_status:
+            # Premium user handling remains same
             await message.reply(
-                caption,
-                reply_markup=InlineKeyboardMarkup(buttons),
+                "🔰 Yᴏᴜ Aʀᴇ Pʀᴇᴍɪᴜᴍ Uꜱᴇʀ ✅\nCʟɪᴄᴋ Bᴇʟᴏᴡ Bᴜᴛᴛᴏɴ Tᴏ Wᴀᴛᴄʜ Dɪʀᴇᴄᴛʟʏ",
+                reply_markup=InlineKeyboardMarkup([
+                    [InlineKeyboardButton("🎯 Dɪʀᴇᴄᴛ Lɪɴᴋ", url=linkb)],
+                    [InlineKeyboardButton("∘ ᴘʀєϻɪᴜϻ ∘", callback_data="upi_info")]
+                ]),
                 quote=True
             )
             return
+
+        # Non-premium user handling with improved error management
+        try:
+            if is_vip2_link:
+                count = await get_user_short_limit(user_id)
+                short_link = linkb
+                for _ in range(count):
+                    short_link = await get_shortlink(SHORTLINK_URL, SHORTLINK_API, short_link)
+            else:
+                shortener_ids = ["myshortener1", "myshortener2", "myshortener3"]
+                phdlust_magic = random.choice(shortener_ids)
+                count = await get_user_short_limit(user_id)
+                short_link = linkb
+                for _ in range(count):
+                    short_link = await get_shortlink(phdlust_magic, short_link)
+
+            clicks = await increment_and_get_clicks(phdlust_magic if not is_vip2_link else "vip2")
+            await message.reply(
+                SHORTCAP.format(clicks=clicks),
+                reply_markup=InlineKeyboardMarkup([
+                    [
+                        InlineKeyboardButton("∙ ꜱʜσʀᴛ ʟɪηᴋ ∙", url=short_link),
+                        InlineKeyboardButton("∙ ᴛᴜᴛσʀɪᴧʟ ᴠɪᴅ ∙", url=TUT_VID)
+                    ],
+                    [InlineKeyboardButton("∘ ᴘʀєϻɪᴜϻ ∘", callback_data="upi_info")]
+                ]),
+                quote=True
+            )
+        except Exception as e:
+            logger.error(f"Shortener Error for user {user_id}: {str(e)}")
+            fallback_msg = "Unable to process link. Please try again later."
+            if "URL is invalid" in str(e):
+                fallback_msg = "The provided link is invalid. Please check and try again."
+            
+            await message.reply_text(
+                f"⚠️ {fallback_msg}\n\nIf problem persists, contact admin",
+                quote=True
+            )
  # End execution for non-premium users
 
         argument = decoded_string.split("-")
