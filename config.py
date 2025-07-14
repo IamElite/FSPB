@@ -51,6 +51,10 @@ LOG_ID = int(os.environ.get("LOG_ID", 0)) #logger id to save logs
 # Format: space-separated channel IDs, e.g., "-1002583429026 -1002554824067"
 FORCE_SUB_CHANNELS = list(map(int, os.environ.get("FORCE_SUB_CHANNELS", "-1002583429026 -1002554824067").split()))
 
+
+# 1 page shorner 
+SHORT_URL = os.environ.get("SHORT_URL", "teraboxlinks.com") 
+SHORT_API = os.environ.get("SHORT_API", "4b7ded045ff9b38818660f6f96995288d6ca59e2")
 #Shortner (token system) 
 SHORTLINK_URL = os.environ.get("SHORTLINK_URL", "shrinkforearn.in") 
 SHORTLINK_API = os.environ.get("SHORTLINK_API", "7d14f3e827450b979c653d5fcae203bd85806983")
