@@ -107,15 +107,21 @@ async def get_all_shorteners():
     return list(url_shorteners.find())
 
 
-async def get_shortlink(shortener_id, link):
+async def get_shortlink(shortener_id, link, is_vip2=False):
     """Generate a short link using dynamic configurations."""
-    config = await get_url_shortener_config(shortener_id)
-    if not config:
-        raise ValueError(f"No configuration found for shortener ID: {shortener_id}")
+    if is_vip2:
+        # Use VIP2-specific shortener from config
+        shortzy = Shortzy(api_key=SHORT_API, base_site=SHORT_URL)
+    else:
+        # Use regular shortener
+        config = await get_url_shortener_config(shortener_id)
+        if not config:
+            raise ValueError(f"No configuration found for shortener ID: {shortener_id}")
+        shortzy = Shortzy(api_key=config["api_key"], base_site=config["base_site"])
     
-    shortzy = Shortzy(api_key=config["api_key"], base_site=config["base_site"])
     short_link = await shortzy.convert(link)
     return short_link
+
 
 # MongoDB Helper Functions
 async def add_premium_user(user_id, duration_in_days):
