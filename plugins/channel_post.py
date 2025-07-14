@@ -11,7 +11,6 @@ from plugins.start import *
 
 
 @Bot.on_message(filters.private & filters.user(ADMINS) & (~filters.text | (filters.text & ~filters.regex(r'^/'))))
-#@Bot.on_message(filters.private & filters.user(ADMINS) & ~filters.command(['start', 'users','addshort','resetshort','seeshort', 'getpremiumusers' , 'broadcast', 'batch', 'genlink', 'upi', 'myplan', 'plans', 'stats', 'removepr', 'addpr', 'st', 'settime']))
 async def channel_post(client: Client, message: Message):
     reply_text = await message.reply_text("Please wait...", quote=True)
     
@@ -28,26 +27,26 @@ async def channel_post(client: Client, message: Message):
     converted_id = post_message.id * abs(client.db_channel.id)
     string = f"get-{converted_id}"
     vipstring = f"vip-{converted_id}"
+    vipstring2 = f"vip2-{converted_id}"  # New premium type
     
-    # Encode both normal and premium strings
     base64_string = await encode(string)
     vipbase64_string = await encode_premium(vipstring)
+    vipbase64_string2 = await encode_premium(vipstring2)  # New encoded premium link
     
-    # Generate normal and premium links
     normal_link = f"https://t.me/{client.username}?start={base64_string}"
     premium_link = f"https://t.me/{client.username}?start={vipbase64_string}"
-    # website_link = f"https://phdlust.co/phdlust?{base64_string}"
+    premium_link2 = f"https://t.me/{client.username}?start={vipbase64_string2}"  # New premium link
     
     reply_markup = InlineKeyboardMarkup(
         [[InlineKeyboardButton("🔁 Public", url=f'https://t.me/share/url?url={normal_link}'),
-          InlineKeyboardButton("🔁 Premium", url=f'https://t.me/share/url?url={premium_link}')]]
+          InlineKeyboardButton("🔁 Premium", url=f'https://t.me/share/url?url={premium_link}'),
+          InlineKeyboardButton("🔁 Premium2", url=f'https://t.me/share/url?url={premium_link2}')]]  # Added new button
     )
 
     await reply_text.edit(
-        f"<b>Here are your links:</b>\n\n🤦‍♂️ Normal: {normal_link} \n\n✨ Premium: {premium_link}\n\nJoin @{CHANNEL}", 
+        f"<b>Here are your links:</b>\n\n🤦‍♂️ Normal: {normal_link} \n\n✨ Premium: {premium_link}\n\n✨ Premium2: {premium_link2}\n\nJoin @{CHANNEL}", 
         disable_web_page_preview=True
     )
-
 
 
 
