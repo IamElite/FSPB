@@ -1,6 +1,3 @@
-# https://t.me/Ultroid_Official/524
-
-
 
 import asyncio
 from pyrogram import filters, Client
@@ -72,9 +69,3 @@ async def new_post(client: Client, message: Message):
         print(e)
         pass
 
-
-
-
-
-
-# https://t.me/Ultroid_Official/524
