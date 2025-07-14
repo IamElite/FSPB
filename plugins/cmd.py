@@ -106,7 +106,7 @@ async def add_premium(bot: Bot, message: Message):
     await message.reply(f"✅ User {target} added to premium until {expiry}")
     await log_action(bot, target, message.from_user, "Added", days)
 
-@Bot.on_message(filters.private & filters.command('removepr') & filters.user(ADMINS))
+@Bot.on_message(filters.private & filters.command(['removepr', 'rmpr']) & filters.user(ADMINS))
 async def remove_premium(bot: Bot, message: Message):
     if not (target := await extract_user(bot, message)):
         return await message.reply("❌ Invalid user. Use ID, username, or reply to user.")
@@ -222,7 +222,7 @@ async def upi_info(bot: Bot, message: Message):
     )
 
 # Command to retrieve a list of active premium users (admin only)
-@Bot.on_message(filters.private & filters.command('getpremiumusers') & filters.user(ADMINS))
+@Bot.on_message(filters.private & filters.command(['getpremiumusers', 'prlist']) & filters.user(ADMINS))
 async def get_premium_users(bot: Bot, message: Message):
     try:
         premium_users = phdlust.find({"is_premium": True, "expiry_time": {"$gt": time.time()}})
