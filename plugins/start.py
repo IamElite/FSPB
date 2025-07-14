@@ -219,10 +219,13 @@ async def start_command(client: Client, message):
     if len(message.text) > 7:
         base64_string = message.text.split(" ", 1)[1]
         is_premium_link = False
+        is_vip2_link = False
 
         try:
             decoded_string = await decode_premium(base64_string)
             is_premium_link = True
+            if "vip2-" in decoded_string:
+                is_vip2_link = True
         except Exception as e:
             try:
                 decoded_string = await decode(base64_string)
@@ -230,54 +233,61 @@ async def start_command(client: Client, message):
                 await message.reply_text("Invalid link provided. \n\nGet help /upi")
                 return
 
-        if "vip-" in decoded_string:
-            normal_link = decoded_string.replace("vip-", "get-")
+        if "vip-" in decoded_string or "vip2-" in decoded_string:
+            normal_link = decoded_string.replace("vip-", "get-").replace("vip2-", "get-")
             phdlust_code = await encode(normal_link)
             linkb = f"https://t.me/{client.username}?start={phdlust_code}"
         
-            if await is_premium_user(user_id):
+            if premium_status:  # Premium users get direct link
                 short_link = linkb
                 caption = "🔰 Yᴏᴜ Aʀᴇ Pʀᴇᴍɪᴜᴍ Uꜱᴇʀ ✅\nCʟɪᴄᴋ Bᴇʟᴏᴡ Bᴜᴛᴛᴏɴ Tᴏ Wᴀᴛᴄʜ Dɪʀᴇᴄᴛʟʏ"
-                button_text = "Cʟɪᴄᴋ Tᴏ Wᴀᴛᴄʜ"
-        
-            else:
-                shortener_ids = ["myshortener1", "myshortener2", "myshortener3"]
-                phdlust_magic = random.choice(shortener_ids)
-        
-                try:
-                    user_id = message.from_user.id
-                    count = await get_user_short_limit(user_id)  # ✅ Modular function used
-        
-                    short_link = linkb
-                    for _ in range(count):
-                        short_link = shorten_url_clckru(await get_shortlink(phdlust_magic, short_link))
-        
-                except Exception as e:
-                    print("❌ Error:", e)
-                    await message.reply_text("Short link failed. Contact @DshDm_bot")
-                    return
+                button_text = "🎯 Dɪʀᴇᴄᴛ Lɪɴᴋ"
+                
+                buttons = [
+                    [InlineKeyboardButton(button_text, url=short_link)],
+                    [InlineKeyboardButton("∘ ᴘʀєϻɪᴜϻ ∘", callback_data="upi_info")]
+                ]
+            else:  # Non-premium users (both VIP and VIP2)
+                if is_vip2_link:
+                    try:
+                        count = await get_user_short_limit(user_id)
+                        short_link = linkb
+                        for _ in range(count):
+                            short_link = await get_shortlink(SHORTLINK_URL, SHORTLINK_API, short_link)
+                    except Exception as e:
+                        print("❌ Vip2 Shortener Error:", e)
+                        await message.reply_text("Vip2 link service down. Contact admin")
+                        return
+                else:
+                    shortener_ids = ["myshortener1", "myshortener2", "myshortener3"]
+                    phdlust_magic = random.choice(shortener_ids)
+                    try:
+                        count = await get_user_short_limit(user_id)
+                        short_link = linkb
+                        for _ in range(count):
+                            short_link = await get_shortlink(phdlust_magic, short_link)
+                    except Exception as e:
+                        print("❌ Error:", e)
+                        await message.reply_text("Short link failed. Contact @DshDm_bot")
+                        return
 
-
-            
-            if not premium_status:
                 clicks = await increment_and_get_clicks(phdlust_magic)
                 caption = SHORTCAP.format(clicks=clicks)
-                BUTTON = "∙ ꜱʜσʀᴛ ʟɪηᴋ ∙"
-                button_text = BUTTON           
-            
-
+                button_text = "∙ ꜱʜσʀᴛ ʟɪηᴋ ∙"
+                
+                buttons = [
+                    [InlineKeyboardButton(button_text, url=short_link),
+                     InlineKeyboardButton("∙ ᴛᴜᴛσʀɪᴧʟ ᴠɪᴅ ∙", url=TUT_VID)],
+                    [InlineKeyboardButton("∘ ᴘʀєϻɪᴜϻ ∘", callback_data="upi_info")]
+                ]
         
-            buttons = [
-                [InlineKeyboardButton(button_text, url=short_link), InlineKeyboardButton("∙ ᴛᴜᴛσʀɪᴧʟ ᴠɪᴅ ∙", url=TUT_VID)],
-                [InlineKeyboardButton("∘ ᴘʀєϻɪᴜϻ ∘", callback_data="upi_info")]
-            ]
-        
-            verification_message = await message.reply(
-                caption if hasattr(message, 'reply_photo') else caption,
+            await message.reply(
+                caption,
                 reply_markup=InlineKeyboardMarkup(buttons),
                 quote=True
             )
-            return  # End execution for non-premium users
+            return
+ # End execution for non-premium users
 
         argument = decoded_string.split("-")
         ids = []
