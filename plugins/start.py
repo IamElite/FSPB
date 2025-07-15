@@ -40,9 +40,9 @@ def shorten_url_tinyurl(url):
     return response.text
 
 # Add this function to increment and fetch clicks
-async def increment_and_get_clicks(link_id):
+async def increment_and_get_clicks(short_url):
     result = url_shorteners.find_one_and_update(
-        {"_id": link_id},
+        {"short_url": short_url},
         {"$inc": {"clicks": 1}},
         return_document=True
     )
@@ -265,7 +265,7 @@ async def start_command(client: Client, message):
                         short_link = linkb
                         for _ in range(count):
                             short_link = shorten_url_clckru(await get_shortlink2(short_link))
-                            phdlust_magic = short_link
+                            short_url = short_link
                     except Exception as e:
                         logger.error(f"❌ Vip2 Shortener Error: {e}")
                         await message.reply_text("Invalid VIP2 link format detected. Please check the link and try again.")
@@ -279,6 +279,7 @@ async def start_command(client: Client, message):
                         short_link = linkb
                         for _ in range(count):
                             short_link = shorten_url_clckru(await get_shortlink(phdlust_magic, short_link))
+                            short_url = short_link
                     except Exception as e:
                         print("❌ Error:", e)
                         await message.reply_text("Short link failed. Contact @DshDm_bot")
