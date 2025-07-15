@@ -265,7 +265,7 @@ async def start_command(client: Client, message):
                         count = await get_user_short_limit(user_id)
                         short_link = linkb
                         for _ in range(count):
-                            short_link = shorten_url_clckru(await get_shortlink2(short_link))
+                            short_link = shorten_url_tinyurl(await get_shortlink2(short_link))
                         short_url = short_link  # Assign the final short link to phdlust_magic
                     except Exception as e:
                         logger.error(f"❌ Vip2 Shortener Error: {e}")
