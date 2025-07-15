@@ -41,11 +41,11 @@ def shorten_url_tinyurl(url):
 
 # Add this function to increment and fetch clicks
 async def increment_and_get_clicks(link_id):
-    result = url_shorteners.find_one_and_update(
-        {"_id": link_id},
-        {"$inc": {"clicks": 1}},
-        return_document=True
-    )
+    url_shorteners.update_one(
+        {"_id": short_link},
+        {"$setOnInsert": {"clicks": 0}},
+        upsert=True
+     )
     return result.get("clicks", 1) if result else 1
 
 # User ki short limit set karne ka function
