@@ -44,6 +44,7 @@ async def increment_and_get_clicks(link_id):
     result = url_shorteners.find_one_and_update(
         {"_id": link_id},
         {"$inc": {"clicks": 1}},
+        upsert=True,
         return_document=True
     )
     return result.get("clicks", 1) if result else 1
