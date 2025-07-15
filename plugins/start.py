@@ -253,7 +253,7 @@ async def start_command(client: Client, message):
                         short_link = linkb
                 
                         for _ in range(count):
-                            short_link = await get_shortlink(SHORT_URL, SHORT_API, short_link)
+                            short_link = await get_shortlink(SHORT_URL, short_link)
                 
                     except Exception as e:
                         error_msg = str(e)
