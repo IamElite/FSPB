@@ -226,120 +226,144 @@ async def start_command(client: Client, message):
         except Exception as e:
             logger.error(f"Error adding user {user_id}: {e}")
 
-    if len(message.text.split()) == 1:
-        await message.reply_text("Welcome! Please use a valid link to proceed.")
-        return
-
-    base64_string = message.text.split(" ", 1)[1]
-    
-    try:
-        decoded_string = await decode_premium(base64_string)
-    except Exception:
-        try:
-            decoded_string = await decode(base64_string)
-        except Exception:
-            await message.reply_text("Invalid link provided. \n\nGet help /upi")
-            return
-
-    if "vip-" not in decoded_string and "vip2-" not in decoded_string:
-        await message.reply_text("This is not a valid VIP link.")
-        return
-
-    normal_link_payload = decoded_string.replace("vip-", "get-").replace("vip2-", "get-")
-    encoded_payload = await encode(normal_link_payload)
-    final_link = f"https://t.me/{client.username}?start={encoded_payload}"
-    
     premium_status = await is_premium_user(user_id)
-    buttons = []
 
-    if premium_status:
-        caption = "🔰 Yᴏᴜ Aʀᴇ Pʀᴇᴍɪᴜᴍ Uꜱᴇʀ ✅\nCʟɪᴄᴋ Bᴇʟᴏᴡ Bᴜᴛᴛᴏɴ Tᴏ Wᴀᴛᴄʜ Dɪʀᴇᴄᴛʟʏ"
-        buttons.append([InlineKeyboardButton("🎯 Dɪʀᴇᴄᴛ Lɪɴᴋ", url=final_link)])
-    else:
+    if len(message.text) > 7:
+        base64_string = message.text.split(" ", 1)[1]
+        is_premium_link = False
+        is_vip2_link = False
+
         try:
-            count = await get_user_short_limit(user_id)
-            is_vip2 = "vip2-" in decoded_string
-
-            if is_vip2:
-                for _ in range(count):
-                    final_link = shorten_url_clckru(await get_shortlink2(final_link))
-            else:
-                shortener_id = random.choice(["myshortener1", "myshortener2", "myshortener3"])
-                for _ in range(count):
-                    final_link = shorten_url_clckru(await get_shortlink(shortener_id, final_link))
-            
-            clicks = await increment_and_get_clicks(final_link)
-            caption = SHORTCAP.format(clicks=clicks)
-            buttons.append([
-                InlineKeyboardButton("∙ ꜱʜσʀᴛ ʟɪηᴋ ∙", url=final_link),
-                InlineKeyboardButton("∙ ᴛᴜᴛσʀɪᴧʟ ᴠɪᴅ ∙", url=TUT_VID)
-            ])
+            decoded_string = await decode_premium(base64_string)
+            is_premium_link = True
+            if "vip2-" in decoded_string:
+                is_vip2_link = True
         except Exception as e:
-            logger.error(f"❌ Shortener Error for user {user_id}: {e}")
-            await message.reply_text("Short link failed. Contact @DshDm_bot")
-            return
+            try:
+                decoded_string = await decode(base64_string)
+            except Exception as e:
+                await message.reply_text("Invalid link provided. \n\nGet help /upi")
+                return
 
-    buttons.append([InlineKeyboardButton("∘ ᴘʀєϻɪᴜϻ ∘", callback_data="upi_info")])
-    
-    await message.reply(
-        caption,
-        reply_markup=InlineKeyboardMarkup(buttons),
-        quote=True
-    )
-    
-    argument = decoded_string.split("-")
-    ids = []
+        if "vip-" in decoded_string or "vip2-" in decoded_string:
+            normal_link = decoded_string.replace("vip-", "get-").replace("vip2-", "get-")
+            phdlust_code = await encode(normal_link)
+            linkb = f"https://t.me/{client.username}?start={phdlust_code}"
+        
+            if premium_status:  # Premium users get direct link
+                short_link = linkb
+                caption = "🔰 Yᴏᴜ Aʀᴇ Pʀᴇᴍɪᴜᴍ Uꜱᴇʀ ✅\nCʟɪᴄᴋ Bᴇʟᴏᴡ Bᴜᴛᴛᴏɴ Tᴏ Wᴀᴛᴄʜ Dɪʀᴇᴄᴛʟʏ"
+                button_text = "🎯 Dɪʀᴇᴄᴛ Lɪɴᴋ"
+                
+                buttons = [
+                    [InlineKeyboardButton(button_text, url=short_link)],
+                    [InlineKeyboardButton("∘ ᴘʀєϻɪᴜϻ ∘", callback_data="upi_info")]
+                ]
+            else:  # Non-premium users (both VIP and VIP2)
+                if is_vip2_link:
+                    try:
+                        count = await get_user_short_limit(user_id)
+                        short_link = linkb
+                        for _ in range(count):
+                            short_link = shorten_url_clckru(await get_shortlink2(short_link))
+                        short_url = short_link  # Assign the final short link to phdlust_magic
+                    except Exception as e:
+                        logger.error(f"❌ Vip2 Shortener Error: {e}")
+                        await message.reply_text("Invalid VIP2 link format detected. Please check the link and try again.")
+                        return
+            
+                else:
+                    shortener_ids = ["myshortener1", "myshortener2", "myshortener3"]
+                    phdlust_magic = random.choice(shortener_ids)
+                    try:
+                        count = await get_user_short_limit(user_id)
+                        short_link = linkb
+                        for _ in range(count):
+                            short_link = shorten_url_clckru(await get_shortlink(phdlust_magic, short_link))
+                        short_url = short_link  # Assign the final short link to phdlust_magic
+                    except Exception as e:
+                        print("❌ Error:", e)
+                        await message.reply_text("Short link failed. Contact @DshDm_bot")
+                        return
+            
+                # Increment and fetch clicks for the correct link
+                clicks = await increment_and_get_clicks(short_url)
+                caption = SHORTCAP.format(clicks=clicks)
+                button_text = "∙ ꜱʜσʀᴛ ʟɪηᴋ ∙"
+            
+                buttons = [
+                    [InlineKeyboardButton(button_text, url=short_link),
+                     InlineKeyboardButton("∙ ᴛᴜᴛσʀɪᴧʟ ᴠɪᴅ ∙", url=TUT_VID)],
+                    [InlineKeyboardButton("∘ ᴘʀєϻɪᴜϻ ∘", callback_data="upi_info")]
+                ]
+            
+                await message.reply(
+                    caption,
+                    reply_markup=InlineKeyboardMarkup(buttons),
+                    quote=True
+                )
+                return
 
-    if len(argument) == 3:
-        start = int(int(argument[1]) / abs(client.db_channel.id))
-        end = int(int(argument[2]) / abs(client.db_channel.id))
-        ids = list(range(start, end + 1)) if start <= end else list(range(end, start + 1))
-    elif len(argument) == 2:
-        ids = [int(int(argument[1]) / abs(client.db_channel.id))]
+ # End execution for non-premium users
 
-    temp_msg = await message.reply("Please wait...")
-    try:
-        messages = await get_messages(client, ids)
-    except:
-        error_msg = await message.reply_text("Something went wrong..!")
-        return
-    await temp_msg.delete()
+        argument = decoded_string.split("-")
+        ids = []
 
-    phdlusts = []
-    messages = await get_messages(client, ids)
-    for msg in messages:
-        if bool(CUSTOM_CAPTION) & bool(msg.document):
-            caption = CUSTOM_CAPTION.format(previouscaption="" if not msg.caption else msg.caption.html, filename=msg.document.file_name)
-        else:
-            caption = "" if not msg.caption else msg.caption.html
+        if len(argument) == 3:
+            start = int(int(argument[1]) / abs(client.db_channel.id))
+            end = int(int(argument[2]) / abs(client.db_channel.id))
+            ids = list(range(start, end + 1)) if start <= end else list(range(end, start + 1))
+        elif len(argument) == 2:
+            ids = [int(int(argument[1]) / abs(client.db_channel.id))]
 
-        if DISABLE_CHANNEL_BUTTON:
-            reply_markup = msg.reply_markup
-        else:
-            reply_markup = None
+        temp_msg = await message.reply("Please wait...")
+        #asyncio.create_task(schedule_auto_delete(client, temp_msg.chat.id, temp_msg.id, delay=600))
 
         try:
-            phdlust = await msg.copy(chat_id=message.from_user.id, caption=caption, reply_markup=reply_markup, protect_content=PROTECT_CONTENT)
-            phdlusts.append(phdlust)
-            if AUTO_DELETE:
-                asyncio.create_task(schedule_auto_delete(client, phdlust.chat.id, phdlust.id, delay=DELETE_AFTER))
-            await asyncio.sleep(0.2)
-        except FloodWait as e:
-            await asyncio.sleep(e.x)
-            phdlust = await msg.copy(chat_id=message.from_user.id, caption=caption, reply_markup=reply_markup, protect_content=PROTECT_CONTENT)
-            phdlusts.append(phdlust)
+            messages = await get_messages(client, ids)
+        except:
+            error_msg = await message.reply_text("Something went wrong..!")
+            return
+        await temp_msg.delete()
 
-    if GET_AGAIN:
-        get_file_markup = InlineKeyboardMarkup([
-            [InlineKeyboardButton("GET FILE AGAIN", url=f"https://t.me/ {client.username}?start={message.text.split()[1]}")]
-        ])
-        await message.reply(GET_INFORM, reply_markup=get_file_markup)
+        phdlusts = []
+        messages = await get_messages(client, ids)
+        for msg in messages:
+            if bool(CUSTOM_CAPTION) & bool(msg.document):
+                caption = CUSTOM_CAPTION.format(previouscaption = "" if not msg.caption else msg.caption.html, filename = msg.document.file_name)
+            else:
+                caption = "" if not msg.caption else msg.caption.html
 
-    if AUTO_DELETE:
-        delete_notification = await message.reply(NOTIFICATION)
-        asyncio.create_task(delete_notification_after_delay(client, delete_notification.chat.id, delete_notification.id, delay=NOTIFICATION_TIME))
-    
-    
+            if DISABLE_CHANNEL_BUTTON:
+                reply_markup = msg.reply_markup
+            else:
+                reply_markup = None
+            
+            try:
+                messages = await get_messages(client, ids)
+                phdlust = await msg.copy(chat_id=message.from_user.id, caption=caption, reply_markup=reply_markup , protect_content=PROTECT_CONTENT)
+                phdlusts.append(phdlust)
+                if AUTO_DELETE == True:
+                    #await message.reply_text(f"The message will be automatically deleted in {delete_after} seconds.")
+                    asyncio.create_task(schedule_auto_delete(client, phdlust.chat.id, phdlust.id, delay=DELETE_AFTER))
+                await asyncio.sleep(0.2)      
+                #asyncio.sleep(0.2)
+            except FloodWait as e:
+                await asyncio.sleep(e.x)
+                phdlust = await msg.copy(chat_id=message.from_user.id, caption=caption, reply_markup=reply_markup , protect_content=PROTECT_CONTENT)
+                phdlusts.append(phdlust)     
+
+        # Notify user to get file again if messages are auto-deleted
+        if GET_AGAIN == True:
+            get_file_markup = InlineKeyboardMarkup([
+                [InlineKeyboardButton("GET FILE AGAIN", url=f"https://t.me/{client.username}?start={message.text.split()[1]}")]
+            ])
+            await message.reply(GET_INFORM, reply_markup=get_file_markup)
+
+        if AUTO_DELETE == True:
+            delete_notification = await message.reply(NOTIFICATION)
+            asyncio.create_task(delete_notification_after_delay(client, delete_notification.chat.id, delete_notification.id, delay=NOTIFICATION_TIME))
+
     else:
         reply_markup = InlineKeyboardMarkup(
             [
