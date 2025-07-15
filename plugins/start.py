@@ -285,7 +285,7 @@ async def start_command(client: Client, message):
                         await message.reply_text("Short link failed. Contact @DshDm_bot")
                         return
 
-                clicks = await increment_and_get_clicks(phdlust_magic)
+                clicks = await increment_and_get_clicks(short_url)
                 caption = SHORTCAP.format(clicks=clicks)
                 button_text = "∙ ꜱʜσʀᴛ ʟɪηᴋ ∙"
                 
