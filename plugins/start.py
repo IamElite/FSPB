@@ -264,8 +264,8 @@ async def start_command(client: Client, message):
                         count = await get_user_short_limit(user_id)
                         short_link = linkb
                         for _ in range(count):
-                            short_link = shorten_url_clckru(await get_shortlink2(short_link))
-                            phdlust_magic = short_link
+                            #short_link = shorten_url_clckru(await get_shortlink2(short_link))
+                            phdlust_magic = await get_shortlink2(short_link)
                     except Exception as e:
                         logger.error(f"❌ Vip2 Shortener Error: {e}")
                         await message.reply_text("Invalid VIP2 link format detected. Please check the link and try again.")
