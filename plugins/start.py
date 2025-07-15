@@ -265,7 +265,7 @@ async def start_command(client: Client, message):
                         short_link = linkb
                         for _ in range(count):
                             short_link = shorten_url_clckru(await get_shortlink2(short_link))
-                        phdlust_magic = short_link  # Assign the final short link to phdlust_magic
+                        short_url = short_link  # Assign the final short link to phdlust_magic
                     except Exception as e:
                         logger.error(f"❌ Vip2 Shortener Error: {e}")
                         await message.reply_text("Invalid VIP2 link format detected. Please check the link and try again.")
@@ -279,14 +279,14 @@ async def start_command(client: Client, message):
                         short_link = linkb
                         for _ in range(count):
                             short_link = shorten_url_clckru(await get_shortlink(phdlust_magic, short_link))
-                        phdlust_magic = short_link  # Assign the final short link to phdlust_magic
+                        short_url = short_link  # Assign the final short link to phdlust_magic
                     except Exception as e:
                         print("❌ Error:", e)
                         await message.reply_text("Short link failed. Contact @DshDm_bot")
                         return
             
                 # Increment and fetch clicks for the correct link
-                clicks = await increment_and_get_clicks(phdlust_magic)
+                clicks = await increment_and_get_clicks(short_url)
                 caption = SHORTCAP.format(clicks=clicks)
                 button_text = "∙ ꜱʜσʀᴛ ʟɪηᴋ ∙"
             
