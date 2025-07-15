@@ -42,7 +42,7 @@ def shorten_url_tinyurl(url):
 # Add this function to increment and fetch clicks
 async def increment_and_get_clicks(link_id):
     url_shorteners.update_one(
-        {"_id": short_link},
+        {"_id": short_url},
         {"$setOnInsert": {"clicks": 0}},
         upsert=True
      )
