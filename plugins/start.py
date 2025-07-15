@@ -121,6 +121,18 @@ async def get_shortlink(shortener_id, link, is_vip2=False):
     return short_link
 
 
+async def get_shortlink2(link):
+
+    shortzy = Shortzy(api_key=SHORT_API, base_site=SHORT_URL)
+
+    try:
+        short_link = await shortzy.convert(link)
+        return short_link
+    except Exception as e:
+        raise ValueError(f"❌ Vip2 Shortener Service Error: {e}")
+
+
+
 
 # MongoDB Helper Functions
 async def add_premium_user(user_id, duration_in_days):
@@ -251,22 +263,11 @@ async def start_command(client: Client, message):
                     try:
                         count = await get_user_short_limit(user_id)
                         short_link = linkb
-                
                         for _ in range(count):
-                            short_link = await get_shortlink("vip2", short_link)
-                
+                            short_link = await get_shortlink2(short_link)
                     except Exception as e:
-                        error_msg = str(e)
-                        logger.error(f"❌ Vip2 Shortener Error: {error_msg}")
-                
-                        if "URL is invalid" in error_msg:
-                            await message.reply_text(
-                                "⚠️ Invalid VIP2 link format detected.\n\nPlease check the link and try again."
-                            )
-                        else:
-                            await message.reply_text(
-                                "❌ Vip2 link service is currently down.\nPlease contact admin."
-                            )
+                        logger.error(f"❌ Vip2 Shortener Error: {e}")
+                        await message.reply_text("Invalid VIP2 link format detected. Please check the link and try again.")
                         return
 
                 else:
