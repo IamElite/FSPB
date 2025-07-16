@@ -33,9 +33,9 @@ async def handle_request(bot: Bot, message: Message):
             parse_mode=ParseMode.MARKDOWN)
 
         success = await message.reply(
-            "**✨ ʀєǫᴜєꜱᴛ ꜱᴜʙϻɪᴛᴛєᴅ — 🔔 ᴧᴄᴛɪση ᴄσϻᴘʟєᴛє. ꜱᴛᴧʏ ᴛᴜηєᴅ.**",
+            "**✅ ʀєǫᴜєꜱᴛ ꜱᴜʙϻɪᴛᴛєᴅ — 🔔 ᴧᴄᴛɪση ᴄσϻᴘʟєᴛє. ꜱᴛᴧʏ ᴛᴜηєᴅ.**",
             parse_mode=ParseMode.MARKDOWN)
-        await asyncio.sleep(60)
+        await asyncio.sleep(10)
         await success.delete()
 
     except Exception as e:
