@@ -16,7 +16,7 @@ async def handle_request(bot: Bot, message: Message):
     try:
         if not (await get_user_subscription(message.from_user.id))[0]:
             return await message.reply("**⚠️ ᴘʀєϻɪᴜϻ ʀєǫᴜɪʀєᴅ 💎**\n__ᴜᴘɢʀᴧᴅє ᴛσ ᴜηʟσᴄᴋ ꜰєᴧᴛᴜʀє 🔓.__",
-                reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("▸ ᴜηʟσᴄᴋ ◂", url=PR_MSG)]]),
+                reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("❖ ᴜηʟσᴄᴋ ❖", url=PR_MSG)]]),
                 parse_mode=ParseMode.MARKDOWN)
         
         if len(message.text.split()) < 2:
