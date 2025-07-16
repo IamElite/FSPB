@@ -103,7 +103,7 @@ async def add_premium(bot: Bot, message: Message):
         
         await message.reply(f"✅ User {target} added to premium until {expiry}")
         await bot.send_message(target, 
-            f"🎉 **ᴘʀєϻɪᴜϻ ᴧᴄᴄєꜱꜱ ɢʀᴧηᴛєᴅ!**\n\n❖ __ᴅᴜʀᴧᴛɪση ➛  {days} ᴅᴧʏꜱ__\n❖ __єxᴘɪʀʏ ➛  {expiry}__\n\n**ᴛʜᴧηᴋ ʏσᴜ ꜰσʀ ꜱᴜʙꜱᴄʀɪʙɪηɢ!** 🚀", parse_mode=ParseMode.MARKDOWN)
+            f"💎 **ᴘʀєϻɪᴜϻ ᴧᴄᴄєꜱꜱ ɢʀᴧηᴛєᴅ! 🎉**\n\n❖  __ᴅᴜʀᴧᴛɪση ➛  {days} ᴅᴧʏꜱ__\n❖  __єxᴘɪʀʏ ➛  {expiry}__\n\n**ᴛʜᴧηᴋ ʏσᴜ ꜰσʀ ꜱᴜʙꜱᴄʀɪʙɪηɢ!** 🚀", parse_mode=ParseMode.MARKDOWN)
     except IndexError:
         await message.reply("Usage: /addpr user duration_in_days")
     except Exception as e:
