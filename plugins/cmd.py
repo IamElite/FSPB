@@ -122,7 +122,7 @@ async def remove_premium(bot: Bot, message: Message):
     
     try:
         await bot.send_message(target,
-            "⚠️ ᴘʀєϻɪᴜϻ ᴧᴄᴄєꜱꜱ ʀєᴠσᴋєᴅ\n\nᴄσηᴛᴧᴄᴛ @DshDm_bot ɪꜰ ᴛʜɪꜱ ᴡᴧꜱ ᴧ ϻɪꜱᴛᴧᴋє.", parse_mode=ParseMode.MARKDOWN)
+            "⚠️ **ᴘʀєϻɪᴜϻ ᴧᴄᴄєꜱꜱ ʀєᴠσᴋєᴅ\n\nᴄσηᴛᴧᴄᴛ @DshDm_bot ɪꜰ ᴛʜɪꜱ ᴡᴧꜱ ᴧ ϻɪꜱᴛᴧᴋє.**", parse_mode=ParseMode.MARKDOWN)
     except Exception as e:
         print(f"Remove Premium Error: {e}")
     finally:
