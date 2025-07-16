@@ -15,8 +15,8 @@ import time
 async def handle_request(bot: Bot, message: Message):
     try:
         if not (await get_user_subscription(message.from_user.id))[0]:
-            return await message.reply("💎 **ᴘʀєϻɪᴜϻ ʀєǫᴜɪʀєᴅ\nᴜᴘɢʀᴧᴅє ᴛσ ᴜηʟσᴄᴋ ᴛʜɪꜱ ꜰєᴧᴛᴜʀє** 🔒.",
-                reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("🔓 ᴜηʟσᴄᴋ", url=PR_MSG)]]),
+            return await message.reply("💎 **ᴘʀєϻɪᴜϻ ʀєǫᴜɪʀєᴅ\nᴜᴘɢʀᴧᴅє ᴛσ ᴜηʟσᴄᴋ ᴛʜɪꜱ ꜰєᴧᴛᴜʀє** 🔓.",
+                reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("✿ ᴜηʟσᴄᴋ ✿", url=PR_MSG)]]),
                 parse_mode=ParseMode.MARKDOWN)
         
         if len(message.text.split()) < 2:
@@ -33,7 +33,7 @@ async def handle_request(bot: Bot, message: Message):
             parse_mode=ParseMode.MARKDOWN)
 
         success = await message.reply(
-            "**✨ ʀєǫᴜєꜱᴛ ꜱᴜʙϻɪᴛᴛєᴅ — ʏσᴜ'ʀє ση ʏσᴜʀ ᴡᴧʏ!\n🔔 ᴧᴄᴛɪση ᴄσϻᴘʟєᴛє. ꜱᴛᴧʏ ᴛᴜηєᴅ.**",
+            "**✨ ʀєǫᴜєꜱᴛ ꜱᴜʙϻɪᴛᴛєᴅ — ʏσᴜ'ʀє ση ʏσᴜʀ ᴡᴧʏ! 🔔 ᴧᴄᴛɪση ᴄσϻᴘʟєᴛє. ꜱᴛᴧʏ ᴛᴜηєᴅ.**",
             parse_mode=ParseMode.MARKDOWN)
         await asyncio.sleep(60)
         await success.delete()
@@ -103,7 +103,7 @@ async def add_premium(bot: Bot, message: Message):
         
         await message.reply(f"✅ User {target} added to premium until {expiry}")
         await bot.send_message(target, 
-            f"🎉 Premium Access Granted!\nDuration: {days} days\nExpiry: {expiry}\nThank you for subscribing! 🚀")
+            f"🎉 **ᴘʀєϻɪᴜϻ ᴧᴄᴄєꜱꜱ ɢʀᴧηᴛєᴅ!**\n\n__ᴅᴜʀᴧᴛɪση ➛  {days} ᴅᴧʏꜱ__\n__єxᴘɪʀʏ** ➛  {expiry}__\n\n**ᴛʜᴧηᴋ ʏσᴜ ꜰσʀ ꜱᴜʙꜱᴄʀɪʙɪηɢ!** 🚀", parse_mode=ParseMode.MARKDOWN)
     except IndexError:
         await message.reply("Usage: /addpr user duration_in_days")
     except Exception as e:
@@ -122,7 +122,7 @@ async def remove_premium(bot: Bot, message: Message):
     
     try:
         await bot.send_message(target,
-            "⚠️ Premium Access Revoked\n\nContact support if this was a mistake.")
+            "⚠️ ᴘʀєϻɪᴜϻ ᴧᴄᴄєꜱꜱ ʀєᴠσᴋєᴅ\n\nᴄσηᴛᴧᴄᴛ @DshDm_bot ɪꜰ ᴛʜɪꜱ ᴡᴧꜱ ᴧ ϻɪꜱᴛᴧᴋє.", parse_mode=ParseMode.MARKDOWN)
     except Exception as e:
         print(f"Remove Premium Error: {e}")
     finally:
