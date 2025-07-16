@@ -15,7 +15,7 @@ import time
 async def handle_request(bot: Bot, message: Message):
     try:
         if not (await get_user_subscription(message.from_user.id))[0]:
-            return await message.reply("**⚠️ ᴘʀєϻɪᴜϻ ʀєǫᴜɪʀєᴅ 💎\nᴜᴘɢʀᴧᴅє ᴛσ ᴜηʟσᴄᴋ ᴛʜɪꜱ ꜰєᴧᴛᴜʀє 🔓.**",
+            return await message.reply("**⚠️ ᴘʀєϻɪᴜϻ ʀєǫᴜɪʀєᴅ 💎\nᴜᴘɢʀᴧᴅє ᴛσ ᴜηʟσᴄᴋ ꜰєᴧᴛᴜʀє 🔓.**",
                 reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("▸ ᴜηʟσᴄᴋ ◂", url=PR_MSG)]]),
                 parse_mode=ParseMode.MARKDOWN)
         
