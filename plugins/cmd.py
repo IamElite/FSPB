@@ -94,26 +94,40 @@ async def set_or_get_short_count(client, message):
 @Bot.on_message(filters.private & filters.command('addpr') & filters.user(ADMINS))
 async def add_premium(bot: Bot, message: Message):
     if not (target := await extract_user(bot, message)):
-        return await message.reply("❌ Invalid user. Use ID, username, or reply to user.")
+        return await message.reply("❌ Invalid user. Use ID, username, or reply.")
     
     try:
         days = int(message.text.split()[2])
-    except (IndexError, ValueError):
-        return await message.reply("Usage: /addpr user duration_in_days")
+        expiry = (datetime.now() + timedelta(days=days)).strftime('%d-%m-%Y')
+        await add_premium_user(target, days)
+        
+        await message.reply(f"✅ User {target} added to premium until {expiry}")
+        await bot.send_message(target, 
+            f"🎉 Premium Access Granted!\nDuration: {days} days\nExpiry: {expiry}\nThank you for subscribing! 🚀")
+    except IndexError:
+        await message.reply("Usage: /addpr user duration_in_days")
+    except Exception as e:
+        print(f"Add Premium Error: {e}")
+    finally:
+        await log_action(bot, target, message.from_user, "Added", days)
 
-    await add_premium_user(target, days)
-    expiry = (datetime.now() + timedelta(days=days)).strftime('%d-%m-%Y')
-    await message.reply(f"✅ User {target} added to premium until {expiry}")
-    await log_action(bot, target, message.from_user, "Added", days)
 
 @Bot.on_message(filters.private & filters.command(['removepr', 'rmpr']) & filters.user(ADMINS))
 async def remove_premium(bot: Bot, message: Message):
     if not (target := await extract_user(bot, message)):
-        return await message.reply("❌ Invalid user. Use ID, username, or reply to user.")
+        return await message.reply("❌ Invalid user. Use ID, username, or reply.")
     
     await remove_premium_user(target)
     await message.reply(f"✅ User {target} removed from premium")
-    await log_action(bot, target, message.from_user, "Removed")
+    
+    try:
+        await bot.send_message(target,
+            "⚠️ Premium Access Revoked\n\nContact support if this was a mistake.")
+    except Exception as e:
+        print(f"Remove Premium Error: {e}")
+    finally:
+        await log_action(bot, target, message.from_user, "Removed")
+
 
 # Optimized Logging Function
 async def log_action(client: Client, user_id: int, admin: Message, action: str, days: int = 0):
