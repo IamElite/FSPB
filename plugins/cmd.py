@@ -15,8 +15,8 @@ import time
 async def handle_request(bot: Bot, message: Message):
     try:
         if not (await get_user_subscription(message.from_user.id))[0]:
-            return await message.reply("💎 **ᴘʀєϻɪᴜϻ ʀєǫᴜɪʀєᴅ\nᴜᴘɢʀᴧᴅє ᴛσ ᴜηʟσᴄᴋ ᴛʜɪꜱ ꜰєᴧᴛᴜʀє** 🔓.",
-                reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("✿ ᴜηʟσᴄᴋ ✿", url=PR_MSG)]]),
+            return await message.reply("**⚠️ ᴘʀєϻɪᴜϻ ʀєǫᴜɪʀєᴅ 💎\nᴜᴘɢʀᴧᴅє ᴛσ ᴜηʟσᴄᴋ ᴛʜɪꜱ ꜰєᴧᴛᴜʀє 🔓.**",
+                reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("▸ ᴜηʟσᴄᴋ ◂", url=PR_MSG)]]),
                 parse_mode=ParseMode.MARKDOWN)
         
         if len(message.text.split()) < 2:
@@ -29,11 +29,11 @@ async def handle_request(bot: Bot, message: Message):
         await bot.send_message(LOG_ID,
             f"✨ **#NᴇᴡPʀᴇᴍɪᴜᴍRᴇǫᴜᴇꜱᴛ** - {datetime.now().strftime('%d-%m-%Y')} ✨\n\n"
             f"📝 **ʀᴇǫᴜᴇꜱᴛ:**\n{req_text.replace('`', '\\`')}\n\n"
-            f"🔥 **ʀᴇǫᴜᴇꜱᴛᴇᴅ ʙʏ:** [{message.from_user.first_name}](tg://user?id={message.from_user.id})",
+            f"🔥 **ʀᴇǫᴜᴇꜱᴛᴇᴅ ʙʏ:**\n[{message.from_user.first_name}](tg://user?id={message.from_user.id})",
             parse_mode=ParseMode.MARKDOWN)
 
         success = await message.reply(
-            "**✨ ʀєǫᴜєꜱᴛ ꜱᴜʙϻɪᴛᴛєᴅ — ʏσᴜ'ʀє ση ʏσᴜʀ ᴡᴧʏ! 🔔 ᴧᴄᴛɪση ᴄσϻᴘʟєᴛє. ꜱᴛᴧʏ ᴛᴜηєᴅ.**",
+            "**✨ ʀєǫᴜєꜱᴛ ꜱᴜʙϻɪᴛᴛєᴅ — 🔔 ᴧᴄᴛɪση ᴄσϻᴘʟєᴛє. ꜱᴛᴧʏ ᴛᴜηєᴅ.**",
             parse_mode=ParseMode.MARKDOWN)
         await asyncio.sleep(60)
         await success.delete()
@@ -103,7 +103,7 @@ async def add_premium(bot: Bot, message: Message):
         
         await message.reply(f"✅ User {target} added to premium until {expiry}")
         await bot.send_message(target, 
-            f"🎉 **ᴘʀєϻɪᴜϻ ᴧᴄᴄєꜱꜱ ɢʀᴧηᴛєᴅ!**\n\n__ᴅᴜʀᴧᴛɪση ➛  {days} ᴅᴧʏꜱ__\n__єxᴘɪʀʏ ➛  {expiry}__\n\n**ᴛʜᴧηᴋ ʏσᴜ ꜰσʀ ꜱᴜʙꜱᴄʀɪʙɪηɢ!** 🚀", parse_mode=ParseMode.MARKDOWN)
+            f"🎉 **ᴘʀєϻɪᴜϻ ᴧᴄᴄєꜱꜱ ɢʀᴧηᴛєᴅ!**\n\n❖ __ᴅᴜʀᴧᴛɪση ➛  {days} ᴅᴧʏꜱ__\n❖ __єxᴘɪʀʏ ➛  {expiry}__\n\n**ᴛʜᴧηᴋ ʏσᴜ ꜰσʀ ꜱᴜʙꜱᴄʀɪʙɪηɢ!** 🚀", parse_mode=ParseMode.MARKDOWN)
     except IndexError:
         await message.reply("Usage: /addpr user duration_in_days")
     except Exception as e:
