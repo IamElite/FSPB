@@ -384,8 +384,6 @@ async def start_command(client: Client, message):
             ]
         )
         
-        # random effect
-        effect_id = get_random_effect()          # int value
         
         sent_message = await message.reply_photo(
             photo=get_random_image(START_PICS),
@@ -397,7 +395,7 @@ async def start_command(client: Client, message):
                 id=message.from_user.id
             ),
             reply_markup=reply_markup,
-            effect_id=effect_id,                 # effect added
+            effect_id=get_random_effect(),                 # effect added
             quote=True
         )
         #asyncio.create_task(schedule_auto_delete(client, sent_message.chat.id, sent_message.id, delay=autodelete))
