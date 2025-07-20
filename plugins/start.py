@@ -383,9 +383,13 @@ async def start_command(client: Client, message):
             ),
             
             reply_markup=reply_markup,
-            effect_id=5107584321108051014,
+            #effect_id=5107584321108051014,
             #disable_web_page_preview=True, #To of pic -> give #to photo and remove me frome #
             quote=True
+        )
+        await app.send_message(
+        chat_id=message.chat.id,
+        effect_id=5107584321108051014
         )
         #asyncio.create_task(schedule_auto_delete(client, sent_message.chat.id, sent_message.id, delay=autodelete))
         logger.info(f"Sent welcome message to user {user_id} with premium status: {premium_status}")
