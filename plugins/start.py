@@ -63,15 +63,6 @@ async def get_user_short_limit(user_id):
     return user.get("short_limit", 1) if user else 1
 
 
-EFFECT_IDS = [
-    5104841245755180586, # 🔥 
-    5107584321108051014, # 👍 
-    5159385139981059251, # ❤️
-    5046509860389126442, # 🎉
-]
-random_effect = random.choice(EFFECT_IDS)
-
-
 #-------------------------------fetch------------------------------
 
 # Fetch URL shortener configuration
@@ -392,7 +383,7 @@ async def start_command(client: Client, message):
             ),
             
             reply_markup=reply_markup,
-            effect_id=random_effect,
+            effect_id=get_random_effect(),
             #disable_web_page_preview=True, #To of pic -> give #to photo and remove me frome #
             quote=True
         )
