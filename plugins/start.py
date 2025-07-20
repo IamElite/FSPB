@@ -365,12 +365,6 @@ async def start_command(client: Client, message):
             asyncio.create_task(delete_notification_after_delay(client, delete_notification.chat.id, delete_notification.id, delay=NOTIFICATION_TIME))
 
     else:
-        await Bot.send_message(
-            chat_id=message.chat.id,
-            effect_id=5107584321108051014
-        )
-        
-        # 📷 Then send photo with buttons and caption
         reply_markup = InlineKeyboardMarkup(
             [
                 [
@@ -386,9 +380,15 @@ async def start_command(client: Client, message):
             ]
         )
         
-        sent_message = await message.reply_photo(
+        # 1) Photo bina caption ke
+        await message.reply_photo(
             photo=get_random_image(START_PICS),
-            caption=START_MSG.format(
+            quote=True
+        )
+        
+        # 2) Text + buttons with effect
+        await message.reply_text(
+            text=START_MSG.format(
                 first=message.from_user.first_name,
                 last=message.from_user.last_name,
                 username=None if not message.from_user.username else '@' + message.from_user.username,
@@ -396,7 +396,8 @@ async def start_command(client: Client, message):
                 id=message.from_user.id
             ),
             reply_markup=reply_markup,
-            quote=True
+            quote=True,
+            message_effect_id=5107584321108051014  # 🔥 heart-fire effect
         )
         #asyncio.create_task(schedule_auto_delete(client, sent_message.chat.id, sent_message.id, delay=autodelete))
         logger.info(f"Sent welcome message to user {user_id} with premium status: {premium_status}")
