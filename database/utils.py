@@ -1,6 +1,16 @@
 
-import asyncio, time
+import asyncio, time, random
 from bot import Bot as bot
+
+
+EFFECT_IDS = [
+    5104841245755180586, # 🔥 
+    5107584321108051014, # 👍 
+    5159385139981059251, # ❤️
+    5046509860389126442, # 🎉
+]
+random_effect = random.choice(EFFECT_IDS)
+
 
 
 async def extract_user(bot, message):
