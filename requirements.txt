@@ -1,6 +1,6 @@
 # --- For-Bot-Working --------- #
-#pyrogram
-Kurigram
+pyrogram
+#Kurigram
 TgCrypto
 pyromod
 # --- For-Database ------------ #
