@@ -387,7 +387,7 @@ async def start_command(client: Client, message):
             #disable_web_page_preview=True, #To of pic -> give #to photo and remove me frome #
             quote=True
         )
-        await app.send_message(
+        await Bot.send_message(
         chat_id=message.chat.id,
         effect_id=5107584321108051014
         )
