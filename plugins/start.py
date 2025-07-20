@@ -365,39 +365,27 @@ async def start_command(client: Client, message):
             asyncio.create_task(delete_notification_after_delay(client, delete_notification.chat.id, delete_notification.id, delay=NOTIFICATION_TIME))
 
     else:
-        reply_markup = InlineKeyboardMarkup(
+       reply_markup = InlineKeyboardMarkup(
             [
-                [
-                    InlineKeyboardButton("😊 About Me", callback_data="about"),
-                    InlineKeyboardButton("🔒 Close", callback_data="close")
-                ],
-                [
-                    InlineKeyboardButton(
-                        "✨ Upgrade to Premium" if not premium_status else "✨ Premium Content",
-                        callback_data="premium_content"
-                    )
-                ],
+                [InlineKeyboardButton("😊 About Me", callback_data="about"), InlineKeyboardButton("🔒 Close", callback_data="close")],
+                [InlineKeyboardButton("✨ Upgrade to Premium" if not premium_status else "✨ Premium Content", callback_data="premium_content")],
             ]
         )
         
-        # 1) Photo bina caption ke
-        await message.reply_photo(
+        sent_message = await message.reply_photo(
             photo=get_random_image(START_PICS),
-            quote=True
-        )
-        
-        # 2) Text + buttons with effect
-        await message.reply_text(
-            text=START_MSG.format(
-                first=message.from_user.first_name,
-                last=message.from_user.last_name,
-                username=None if not message.from_user.username else '@' + message.from_user.username,
-                mention=message.from_user.mention,
-                id=message.from_user.id
+            caption=START_MSG.format(
+                    first=message.from_user.first_name,
+                    last=message.from_user.last_name,
+                    username=None if not message.from_user.username else '@' + message.from_user.username,
+                    mention=message.from_user.mention,
+                    id=message.from_user.id
             ),
+            
             reply_markup=reply_markup,
-            quote=True,
-            message_effect_id=5107584321108051014  # 🔥 heart-fire effect
+            effect_id=5107584321108051014
+            #disable_web_page_preview=True, #To of pic -> give #to photo and remove me frome #
+            quote=True
         )
         #asyncio.create_task(schedule_auto_delete(client, sent_message.chat.id, sent_message.id, delay=autodelete))
         logger.info(f"Sent welcome message to user {user_id} with premium status: {premium_status}")
