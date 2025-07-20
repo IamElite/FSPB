@@ -365,7 +365,7 @@ async def start_command(client: Client, message):
             asyncio.create_task(delete_notification_after_delay(client, delete_notification.chat.id, delete_notification.id, delay=NOTIFICATION_TIME))
 
     else:
-       reply_markup = InlineKeyboardMarkup(
+        reply_markup = InlineKeyboardMarkup(
             [
                 [InlineKeyboardButton("😊 About Me", callback_data="about"), InlineKeyboardButton("🔒 Close", callback_data="close")],
                 [InlineKeyboardButton("✨ Upgrade to Premium" if not premium_status else "✨ Premium Content", callback_data="premium_content")],
