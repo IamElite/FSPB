@@ -383,19 +383,20 @@ async def start_command(client: Client, message):
             ]
         )
         
+        # random effect
+        effect_id = get_random_effect()          # int value
+        
         sent_message = await message.reply_photo(
             photo=get_random_image(START_PICS),
             caption=START_MSG.format(
-                    first=message.from_user.first_name,
-                    last=message.from_user.last_name,
-                    username=None if not message.from_user.username else '@' + message.from_user.username,
-                    mention=message.from_user.mention,
-                    id=message.from_user.id
+                first=message.from_user.first_name,
+                last=message.from_user.last_name,
+                username=None if not message.from_user.username else '@' + message.from_user.username,
+                mention=message.from_user.mention,
+                id=message.from_user.id
             ),
-            
             reply_markup=reply_markup,
-            effect_id=get_random_effect(),
-            #disable_web_page_preview=True, #To of pic -> give #to photo and remove me frome #
+            effect_id=effect_id,                 # effect added
             quote=True
         )
         #asyncio.create_task(schedule_auto_delete(client, sent_message.chat.id, sent_message.id, delay=autodelete))
