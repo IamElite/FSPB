@@ -63,6 +63,17 @@ async def get_user_short_limit(user_id):
     return user.get("short_limit", 1) if user else 1
 
 
+def get_random_effect():
+    """Return a random free Telegram message-effect ID."""
+    EFFECT_ID = [
+        "5104841245755180586",  # 🔥
+        "5107584321108051014",  # 👍
+        "5159385139981059251",  # ❤️
+        "5046509860389126442"   # 🎉
+    ]
+    return random.choice(EFFECT_ID)
+
+
 #-------------------------------fetch------------------------------
 
 # Fetch URL shortener configuration
