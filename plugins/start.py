@@ -383,6 +383,7 @@ async def start_command(client: Client, message):
             ),
             
             reply_markup=reply_markup,
+            effect_id=5107584321108051014,
             #disable_web_page_preview=True, #To of pic -> give #to photo and remove me frome #
             quote=True
         )
