@@ -30,8 +30,8 @@ class Bot(Client):
         )
         self.LOGGER = LOGGER
 
-    async def start(self):
-        await super().start()
+    async def start(self, *args, **kwargs):          #  <-- fixed signature
+        await super().start(*args, **kwargs)          #  <-- forward all args
         usr_bot_me = await self.get_me()
         self.uptime = datetime.now()
 
