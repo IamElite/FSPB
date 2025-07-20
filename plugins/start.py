@@ -365,7 +365,7 @@ async def start_command(client: Client, message):
             asyncio.create_task(delete_notification_after_delay(client, delete_notification.chat.id, delete_notification.id, delay=NOTIFICATION_TIME))
 
     else:
-        await app.send_message(
+        await Bot.send_message(
             chat_id=message.chat.id,
             effect_id=5107584321108051014
         )
