@@ -21,11 +21,10 @@ async def cb_handler(client: Bot, query: CallbackQuery):
                 f"○ Channel : @{CHANNEL}\n"
                 f"○ Support Group : @{SUPPORT_GROUP}</b>"
             ),
-            disable_web_page_preview=True,
             reply_markup=InlineKeyboardMarkup(
                 [
-                    [InlineKeyboardButton("🔙 Back", callback_data="back_home")],
-                    [InlineKeyboardButton("🔒 Close", callback_data="close")],
+                    InlineKeyboardButton("🔙 Back", callback_data="back_home"),
+                    InlineKeyboardButton("🔒 Close", callback_data="close"),
                 ]
             ),
         )
