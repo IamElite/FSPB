@@ -15,23 +15,58 @@ async def cb_handler(client: Bot, query: CallbackQuery):
 
     if data == "about":
         await query.message.edit_text(
-            text=f"<b>○ Creator : <a href='tg://user?id={OWNER_ID}'>This Person</a>\n"
-                # f"○ Language : <code>Python3</code>\n"
-                # f"○ Library : <a href='https://docs.pyrogram.org/'>Pyrogram asyncio {__version__}</a>\n"
-                 f"○ Source Code : <a href='tg://user?id={OWNER_ID}'>Click here</a>\n"
-                 f"○ Channel : @{CHANNEL}\n"
-                 f"○ Support Group : @{SUPPORT_GROUP}</b>",
+            text=(
+                f"<b>○ Creator : <a href='tg://user?id={OWNER_ID}'>This Person</a>\n"
+                f"○ Source Code : <a href='tg://user?id={OWNER_ID}'>Click here</a>\n"
+                f"○ Channel : @{CHANNEL}\n"
+                f"○ Support Group : @{SUPPORT_GROUP}</b>"
+            ),
             disable_web_page_preview=True,
             reply_markup=InlineKeyboardMarkup(
-                [[InlineKeyboardButton("🔒 Close", callback_data="close")]]
-            )
+                [
+                    [InlineKeyboardButton("🔙 Back", callback_data="back_home")],
+                    [InlineKeyboardButton("🔒 Close", callback_data="close")],
+                ]
+            ),
         )
+
+    elif data == "back_home":
+        # Re-send the original /start message (or edit the current one if you prefer)
+        user_id = query.from_user.id
+        premium_status = await is_premium_user(user_id)
+
+        await query.message.edit_caption(
+            caption=START_MSG.format(
+                first=query.from_user.first_name,
+                last=query.from_user.last_name,
+                username=None if not query.from_user.username else "@" + query.from_user.username,
+                mention=query.from_user.mention,
+                id=query.from_user.id,
+            ),
+            reply_markup=InlineKeyboardMarkup(
+                [
+                    [
+                        InlineKeyboardButton("😊 About Me", callback_data="about"),
+                        InlineKeyboardButton("🔒 Close", callback_data="close"),
+                    ],
+                    [
+                        InlineKeyboardButton(
+                            "✨ Upgrade to Premium" if not premium_status else "✨ Premium Content",
+                            callback_data="premium_content",
+                        )
+                    ],
+                ]
+            ),
+        )
+
     elif data == "close":
         await query.message.delete()
         try:
             await query.message.reply_to_message.delete()
         except Exception as e:
             print(f"Error deleting reply-to message: {e}")
+
+    # … rest of your existing elif blocks …
 
     elif data == "upi_info":
         await upi_info(client, query.message)
