@@ -30,9 +30,8 @@ async def cb_handler(client: Bot, query: CallbackQuery):
                 ]
             ),
         )
-        
+
     elif data == "back_home":
-        # Re-send the original /start message (or edit the current one if you prefer)
         user_id = query.from_user.id
         premium_status = await is_premium_user(user_id)
 
@@ -40,7 +39,9 @@ async def cb_handler(client: Bot, query: CallbackQuery):
             caption=START_MSG.format(
                 first=query.from_user.first_name,
                 last=query.from_user.last_name,
-                username=None if not query.from_user.username else "@" + query.from_user.username,
+                username=None
+                if not query.from_user.username
+                else "@" + query.from_user.username,
                 mention=query.from_user.mention,
                 id=query.from_user.id,
             ),
@@ -52,7 +53,9 @@ async def cb_handler(client: Bot, query: CallbackQuery):
                     ],
                     [
                         InlineKeyboardButton(
-                            "✨ Upgrade to Premium" if not premium_status else "✨ Premium Content",
+                            "✨ Upgrade to Premium"
+                            if not premium_status
+                            else "✨ Premium Content",
                             callback_data="premium_content",
                         )
                     ],
@@ -66,6 +69,7 @@ async def cb_handler(client: Bot, query: CallbackQuery):
             await query.message.reply_to_message.delete()
         except Exception as e:
             print(f"Error deleting reply-to message: {e}")
+
 
     # … rest of your existing elif blocks …
 
