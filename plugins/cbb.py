@@ -23,12 +23,14 @@ async def cb_handler(client: Bot, query: CallbackQuery):
             ),
             reply_markup=InlineKeyboardMarkup(
                 [
-                    InlineKeyboardButton("🔙 Back", callback_data="back_home"),
-                    InlineKeyboardButton("🔒 Close", callback_data="close"),
+                    [
+                        InlineKeyboardButton("🔙 Back", callback_data="back_home"),
+                        InlineKeyboardButton("🔒 Close", callback_data="close"),
+                    ]
                 ]
             ),
         )
-
+        
     elif data == "back_home":
         # Re-send the original /start message (or edit the current one if you prefer)
         user_id = query.from_user.id
