@@ -15,20 +15,22 @@ import time
 MAP={c:v for c,v in zip('AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz',
 'ᴧᴧʙʙᴄᴄᴅᴅєєꜰŦɢɢʜʜɪ¡ᴊᴊᴋҡʟʟϻϻηησσᴘᴘǫǫʀʀꜱѕᴛ†ᴜµᴠѵᴡωxאʏγᴢƶ')}
 
+kb=lambda:[[InlineKeyboardButton('ᴜɴꜱᴀꜰᴇ','u'),InlineKeyboardButton('ꜱᴀꜰᴇ','s')],
+           [InlineKeyboardButton('ᴄʟᴏsᴇ','x')]]
+
 @Bot.on_message(filters.command(['w'], prefixes=["/", "!", ".", ""]) & filters.user(ADMINS))
 async def w(_,m):
  t=m.text.partition(' ')[2]
  if not t:return await m.reply('text?')
- kb=[[InlineKeyboardButton('ᴜɴꜱᴀꜰᴇ','u'),InlineKeyboardButton('ꜱᴀꜰᴇ','s')],
-     [InlineKeyboardButton('ᴄʟᴏsᴇ','x')]]
- await m.reply(f'<code>{t}</code>',reply_markup=InlineKeyboardMarkup(kb),quote=True)
+ await m.reply(f'<code>{t}</code>',reply_markup=InlineKeyboardMarkup(kb()),quote=True)
 
 @Bot.on_callback_query(filters.regex('^[usx]$'))
 async def f(_,q):
  if q.data=='x':return await q.message.delete()
  t=q.message.reply_to_message.text.partition(' ')[2]
- await q.message.edit_text(f'<code>{"".join(MAP.get(c,c)for c in t)}</code>')
-
+ out=''.join(MAP.get(c,c)for c in t)
+ await q.message.edit_text(f'<code>{out}</code>',reply_markup=InlineKeyboardMarkup(kb()))
+ 
 #-------
 @Bot.on_message(filters.private & filters.command('request'))
 async def handle_request(bot: Bot, message: Message):
