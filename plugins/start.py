@@ -5,7 +5,7 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from datetime import datetime, timedelta
 from pyrogram import Client, filters, __version__
 from pyrogram.enums import ParseMode
-from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
+from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery, ChatAction
 from pyrogram.errors import FloodWait, UserIsBlocked, InputUserDeactivated
 
 from bot import Bot
@@ -377,11 +377,24 @@ async def start_command(client: Client, message):
             asyncio.create_task(delete_notification_after_delay(client, delete_notification.chat.id, delete_notification.id, delay=NOTIFICATION_TIME))
 
     else:
+        TYPING_STICKERS = [
+            "CAACAgUAAyEFAASGx2_SAAIH_GiDkmz4kgSR_mMPvWY4lnpn2riLAAI0FwAC1cwhVDTU_mM-XSJZHgQ",
+            "CAACAgUAAyEFAASGx2_SAAIH-WiDkffLxbCPGnINAoOPvel2SPmqAALjGwACLxchVPzzVsvd2gSTHgQ"
+        ]
+        
+        await client.send_chat_action(message.chat.id, ChatAction.TYPING)
+        typing_msg = await client.send_sticker(
+            chat_id=message.chat.id,
+            sticker=random.choice(TYPING_STICKERS),
+            reply_to_message_id=message.id
+        )
+        await asyncio.sleep(1.5)
+        await typing_msg.delete()
+        
         reply_markup = InlineKeyboardMarkup(
             [
                 [InlineKeyboardButton("😊 About Me", callback_data="about"), InlineKeyboardButton("🔒 Close", callback_data="close")],
-                [InlineKeyboardButton("✨ Upgrade to Premium" if not premium_status else "✨ Premium Content", 
-                 callback_data="premium_content")],
+                [InlineKeyboardButton("✨ Upgrade to Premium" if not premium_status else "✨ Premium Content", callback_data="premium_content")],
             ]
         )
         
@@ -389,7 +402,7 @@ async def start_command(client: Client, message):
             photo=get_random_image(START_PICS),
             caption=START_MSG.format(
                 mention=message.from_user.mention,
-                botmention=(await client.get_me()).mention,  # Add this to get bot's mention
+                botmention=(await client.get_me()).mention,
                 first=message.from_user.first_name,
                 last=message.from_user.last_name,
                 username=None if not message.from_user.username else '@' + message.from_user.username,
