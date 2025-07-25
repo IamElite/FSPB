@@ -7,30 +7,25 @@ from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 from plugins.start import *
 from pyrogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
+from pyrogram.types import InlineKeyboardButton as IKB, InlineKeyboardMarkup as IKM
 from pyrogram.enums import ParseMode
 import time
 
 
 # work font
-MAP={c:v for c,v in zip('AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz',
-'ᴧᴧʙʙᴄᴄᴅᴅєєꜰŦɢɢʜʜɪ¡ᴊᴊᴋҡʟʟϻϻηησσᴘᴘǫǫʀʀꜱѕᴛ†ᴜµᴠѵᴡωxאʏγᴢƶ')}
-
-kb=lambda:[[InlineKeyboardButton('ᴜɴꜱᴀꜰᴇ','u'),InlineKeyboardButton('ꜱᴀꜰᴇ','s')],
-           [InlineKeyboardButton('ᴄʟᴏsᴇ','x')]]
+MAP={'s':'ᴧʙᴄᴅєꜰɢʜɪᴊᴋʟϻησᴘǫʀꜱᴛᴜᴠᴡxʏᴢ','u':'ᴧʙᴄᴅєŦɢʜ¡ᴊҡʟϻησᴘǫʀѕ†µѵωאγƶ'}
+def sc(t,m='s'):return t.translate(str.maketrans('A-Za-z',MAP[m]*2))
 
 @Bot.on_message(filters.command(['w'], prefixes=["/", "!", ".", ""]) & filters.user(ADMINS))
 async def w(_,m):
- t=m.text.partition(' ')[2]
- if not t:return await m.reply('text?')
- await m.reply(f'<code>{t}</code>',reply_markup=InlineKeyboardMarkup(kb()),quote=True)
+ t=' '.join(m.command[1:])or await m.reply('Give text');t and await m.reply(f'<code>{t}</code>',reply_markup=IKM([[IKB('ᴜɴꜱᴀꜰᴇ',f'u|{t}'),IKB('ꜱᴀꜰᴇ',f's|{t}')],[IKB('ᴄʟᴏsᴇ','x')]]),quote=1)
 
-@Bot.on_callback_query(filters.regex('^[usx]$'))
-async def f(_,q):
- if q.data=='x':return await q.message.delete()
- t=q.message.reply_to_message.text.partition(' ')[2]
- out=''.join(MAP.get(c,c)for c in t)
- if out==q.message.text[6:-7]:return await q.answer('Already styled')
- await q.message.edit_text(f'<code>{out}</code>',reply_markup=InlineKeyboardMarkup(kb()))
+@Bot.on_callback_query(filters.regex(r'^[su]\|.+'))
+async def cb(_,q):
+ await q.message.edit_text(f'<code>{sc(*q.data.split("|",1))}</code>')
+
+@Bot.on_callback_query(filters.regex('^x$'))
+async def close(_,q):await q.message.delete()
  
 #-------
 @Bot.on_message(filters.private & filters.command('request'))
