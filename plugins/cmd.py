@@ -11,6 +11,36 @@ from pyrogram.enums import ParseMode
 import time
 
 
+# work font
+MAP = {
+    's': dict(zip('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz',
+                  'ᴧʙᴄᴅєꜰɢʜɪᴊᴋʟϻησᴘǫʀꜱᴛᴜᴠᴡxʏᴢᴧʙᴄᴅєꜰɢʜɪᴊᴋʟϻησᴘǫʀꜱᴛᴜᴠᴡxʏᴢ')),
+    'u': dict(zip('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz',
+                  'ᴧʙᴄᴅєŦɢʜ¡ᴊҡʟϻησᴘǫʀѕ†µѵωאγƶᴧʙᴄᴅєŦɢʜ¡ᴊҡʟϻησᴘǫʀѕ†µѵωאγƶ'))
+}
+
+def sc(text, mode='s'): return ''.join(MAP[mode].get(c, c) for c in text)
+
+@Bot.on_message(filters.command(["w"], prefixes="/!.") & filters.user(ADMINS))
+async def w(c, m):
+    t = m.text.split(' ', 1)[1] if len(m.text.split()) > 1 else None
+    if not t: return await m.reply("Give text")
+    bt = [[InlineKeyboardButton("ᴜɴꜱᴀꜰᴇ", "u"), InlineKeyboardButton("ꜱᴀꜰᴇ", "s")],
+          [InlineKeyboardButton("ᴄʟᴏsᴇ", "x")]]
+    await m.reply(f"<code>{t}</code>", reply_markup=InlineKeyboardMarkup(bt), quote=True)
+
+@Bot.on_callback_query(filters.regex("^(s|u|x)$"))
+async def cb(c, q):
+    if q.data == "x": return await q.message.delete()
+    try:
+        txt = q.message.reply_to_message.text
+        txt = txt.split(' ', 1)[1] if txt[0] in "/!." else txt
+        await q.message.edit_text(f"<code>{sc(txt, q.data)}</code>",
+                                  reply_markup=q.message.reply_markup)
+    except Exception as e:
+        await q.answer("Error", show_alert=True)
+
+#-------
 @Bot.on_message(filters.private & filters.command('request'))
 async def handle_request(bot: Bot, message: Message):
     try:
