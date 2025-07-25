@@ -14,22 +14,24 @@ import time
 # work font
 MAP={c:v for c,v in zip('AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz',
 'ᴧᴧʙʙᴄᴄᴅᴅєєꜰŦɢɢʜʜɪ¡ᴊᴊᴋҡʟʟϻϻηησσᴘᴘǫǫʀʀꜱѕᴛ†ᴜµᴠѵᴡωxאʏγᴢƶ')}
-
-kb=lambda:[[InlineKeyboardButton('ᴜɴꜱᴀꜰᴇ','u'),InlineKeyboardButton('ꜱᴀꜰᴇ','s')],
-           [InlineKeyboardButton('ᴄʟᴏsᴇ','x')]]
+sc=lambda t,m:''.join(MAP.get(c,c)for c in t)
 
 @Bot.on_message(filters.command(['w'], prefixes=["/", "!", ".", ""]) & filters.user(ADMINS))
 async def w(_,m):
- t=m.text.partition(' ')[2]
+ t=' '.join(m.command[1:])or None
  if not t:return await m.reply('text?')
- await m.reply(f'<code>{t}</code>',reply_markup=InlineKeyboardMarkup(kb()),quote=True)
+ kb=[[InlineKeyboardButton('ᴜɴꜱᴀꜰᴇ',f'u {t}'),InlineKeyboardButton('ꜱᴀꜰᴇ',f's {t}')],
+     [InlineKeyboardButton('ᴄʟᴏsᴇ','x')]]
+ await m.reply(f'<code>{t}</code>',reply_markup=InlineKeyboardMarkup(kb),quote=True)
 
-@Bot.on_callback_query(filters.regex('^[usx]$'))
+@Bot.on_callback_query(filters.regex(r'^[su] .+'))
 async def f(_,q):
- if q.data=='x':return await q.message.delete()
- t=q.message.reply_to_message.text.partition(' ')[2]
- out=''.join(MAP.get(c,c)for c in t)
- await q.message.edit_text(f'<code>{out}</code>',reply_markup=InlineKeyboardMarkup(kb()))
+ m,t=q.data.split(' ',1)
+ await q.message.edit_text(f'<code>{sc(t,m)}</code>')
+
+@Bot.on_callback_query(filters.regex('^x$'))
+async def c(_,q):
+ await q.message.delete()
  
 #-------
 @Bot.on_message(filters.private & filters.command('request'))
