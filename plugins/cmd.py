@@ -20,9 +20,10 @@ def sc(t,m='s'):return t.translate(str.maketrans('A-Za-z',MAP[m]*2))
 async def w(_,m):
  t=' '.join(m.command[1:])or await m.reply('Give text');t and await m.reply(f'<code>{t}</code>',reply_markup=IKM([[IKB('ᴜɴꜱᴀꜰᴇ',f'u|{t}'),IKB('ꜱᴀꜰᴇ',f's|{t}')],[IKB('ᴄʟᴏsᴇ','x')]]),quote=1)
 
-@Bot.on_callback_query(filters.regex(r'^[su]\|.+'))
-async def cb(_,q):
- await q.message.edit_text(f'<code>{sc(*q.data.split("|",1))}</code>')
+Bot.on_callback_query(filters.regex(r'^[su]\|.+'))
+async def cb(_, q):
+    mode, text = q.data.split('|', 1)        # mode = 'u' or 's'
+    await q.message.edit_text(f'<code>{sc(text, mode)}</code>')
 
 @Bot.on_callback_query(filters.regex('^x$'))
 async def close(_,q):await q.message.delete()
