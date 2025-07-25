@@ -12,33 +12,22 @@ import time
 
 
 # work font
-MAP = {
-    's': dict(zip('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz',
-                  'ᴧʙᴄᴅєꜰɢʜɪᴊᴋʟϻησᴘǫʀꜱᴛᴜᴠᴡxʏᴢᴧʙᴄᴅєꜰɢʜɪᴊᴋʟϻησᴘǫʀꜱᴛᴜᴠᴡxʏᴢ')),
-    'u': dict(zip('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz',
-                  'ᴧʙᴄᴅєŦɢʜ¡ᴊҡʟϻησᴘǫʀѕ†µѵωאγƶᴧʙᴄᴅєŦɢʜ¡ᴊҡʟϻησᴘǫʀѕ†µѵωאγƶ'))
-}
+MAP={c:v for c,v in zip('AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz',
+'ᴧᴧʙʙᴄᴄᴅᴅєєꜰŦɢɢʜʜɪ¡ᴊᴊᴋҡʟʟϻϻηησσᴘᴘǫǫʀʀꜱѕᴛ†ᴜµᴠѵᴡωxאʏγᴢƶ')}
 
-def sc(t, m='s'): return ''.join(MAP[m].get(c, c) for c in t)
+@Bot.on_message(filters.command('w','/!.') & filters.user(ADMINS))
+async def w(_,m):
+ t=m.text.partition(' ')[2]
+ if not t:return await m.reply('text?')
+ kb=[[InlineKeyboardButton('ᴜɴꜱᴀꜰᴇ','u'),InlineKeyboardButton('ꜱᴀꜰᴇ','s')],
+     [InlineKeyboardButton('ᴄʟᴏsᴇ','x')]]
+ await m.reply(f'<code>{t}</code>',reply_markup=InlineKeyboardMarkup(kb),quote=True)
 
-@Bot.on_message(filters.command(["w"], prefixes=["/", "!", ".", ""]) & filters.user(ADMINS))
-async def w(_, m):
-    t = m.text.split(' ', 1)[1] if len(m.text.split()) > 1 else None
-    if not t: return await m.reply("Give text")
-    bt = [[InlineKeyboardButton("ᴜɴꜱᴀꜰᴇ", "u"), InlineKeyboardButton("ꜱᴀꜰᴇ", "s")],
-          [InlineKeyboardButton("ᴄʟᴏsᴇ", "x")]]
-    await m.reply(f"<code>{t}</code>", reply_markup=InlineKeyboardMarkup(bt), quote=True)
-
-@Bot.on_callback_query(filters.regex("^(s|u|x)$"))
-async def cb(_, q):
-    if q.data == "x": return await q.message.delete()
-    try:
-        txt = q.message.reply_to_message.text
-        txt = txt.split(' ', 1)[1] if txt[0] in "/!." else txt
-        await q.message.edit_text(f"<code>{sc(txt, q.data)}</code>",
-                                  reply_markup=q.message.reply_markup)
-    except Exception:
-        await q.answer("Error", show_alert=True)
+@Boton_callback_query(filters.regex('^[usx]$'))
+async def f(_,q):
+ if q.data=='x':return await q.message.delete()
+ t=q.message.reply_to_message.text.partition(' ')[2]
+ await q.message.edit_text(f'<code>{"".join(MAP.get(c,c)for c in t)}</code>')
 
 #-------
 @Bot.on_message(filters.private & filters.command('request'))
