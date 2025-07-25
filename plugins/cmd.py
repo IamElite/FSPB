@@ -13,20 +13,30 @@ import time
 
 
 # work font
-MAP={'s':'ᴧʙᴄᴅєꜰɢʜɪᴊᴋʟϻησᴘǫʀꜱᴛᴜᴠᴡxʏᴢ','u':'ᴧʙᴄᴅєŦɢʜ¡ᴊҡʟϻησᴘǫʀѕ†µѵωאγƶ'}
-def sc(t,m='s'):return t.translate(str.maketrans('A-Za-z',MAP[m]*2))
+MAP = {
+    's': {k: v for k, v in zip('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz',
+                               'ᴧʙᴄᴅєꜰɢʜɪᴊᴋʟϻησᴘǫʀꜱᴛᴜᴠᴡxʏᴢᴧʙᴄᴅєꜰɢʜɪᴊᴋʟϻησᴘǫʀꜱᴛᴜᴠᴡxʏᴢ')},
+    'u': {k: v for k, v in zip('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz',
+                               'ᴧʙᴄᴅєŦɢʜ¡ᴊҡʟϻησᴘǫʀѕ†µѵωאγƶᴧʙᴄᴅєŦɢʜ¡ᴊҡʟϻησᴘǫʀѕ†µѵωאγƶ')}
+}
+sc = lambda t, m='s': ''.join(MAP[m].get(c, c) for c in t)
 
 @Bot.on_message(filters.command(['w'], prefixes=["/", "!", ".", ""]) & filters.user(ADMINS))
-async def w(_,m):
- t=' '.join(m.command[1:])or await m.reply('Give text');t and await m.reply(f'<code>{t}</code>',reply_markup=IKM([[IKB('ᴜɴꜱᴀꜰᴇ',f'u|{t}'),IKB('ꜱᴀꜰᴇ',f's|{t}')],[IKB('ᴄʟᴏsᴇ','x')]]),quote=1)
+async def w(_, m):
+    t = ' '.join(m.command[1:]) or None
+    if not t: return await m.reply("Give text")
+    kb = [[InlineKeyboardButton("ᴜɴꜱᴀꜰᴇ", f"u {t}"), InlineKeyboardButton("ꜱᴀꜰᴇ", f"s {t}")],
+          [InlineKeyboardButton("ᴄʟᴏsᴇ", "x")]]
+    await m.reply(f"<code>{t}</code>", reply_markup=InlineKeyboardMarkup(kb), quote=True)
 
-Bot.on_callback_query(filters.regex(r'^[su]\|.+'))
-async def cb(_, q):
-    mode, text = q.data.split('|', 1)        # mode = 'u' or 's'
-    await q.message.edit_text(f'<code>{sc(text, mode)}</code>')
+@Bot.on_callback_query(filters.regex(r'^[su] .+'))
+async def f(_, q):
+    m, t = q.data.split(' ', 1)
+    await q.message.edit_text(f"<code>{sc(t, m)}</code>")
 
 @Bot.on_callback_query(filters.regex('^x$'))
-async def close(_,q):await q.message.delete()
+async def c(_, q):
+    await q.message.delete()
  
 #-------
 @Bot.on_message(filters.private & filters.command('request'))
