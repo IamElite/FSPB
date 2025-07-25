@@ -23,7 +23,7 @@ async def w(_,m):
      [InlineKeyboardButton('ᴄʟᴏsᴇ','x')]]
  await m.reply(f'<code>{t}</code>',reply_markup=InlineKeyboardMarkup(kb),quote=True)
 
-@Boton_callback_query(filters.regex('^[usx]$'))
+@Bot.on_callback_query(filters.regex('^[usx]$'))
 async def f(_,q):
  if q.data=='x':return await q.message.delete()
  t=q.message.reply_to_message.text.partition(' ')[2]
