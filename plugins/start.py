@@ -5,7 +5,7 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from datetime import datetime, timedelta
 from pyrogram import Client, filters, __version__
 from pyrogram.enums import ParseMode, ChatAction
-from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
+from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery, ReplyParameters
 from pyrogram.errors import FloodWait, UserIsBlocked, InputUserDeactivated
 
 from bot import Bot
@@ -386,7 +386,7 @@ async def start_command(client: Client, message):
         typing_msg = await client.send_sticker(
             chat_id=message.chat.id,
             sticker=random.choice(TYPING_STICKERS),
-            reply_parameters=message.reply_parameters
+            reply_parameters=ReplyParameters(message_id=message.id)
         )
         await asyncio.sleep(1.5)
         await typing_msg.delete()
