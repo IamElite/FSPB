@@ -380,27 +380,27 @@ async def start_command(client: Client, message):
         reply_markup = InlineKeyboardMarkup(
             [
                 [InlineKeyboardButton("😊 About Me", callback_data="about"), InlineKeyboardButton("🔒 Close", callback_data="close")],
-                [InlineKeyboardButton("✨ Upgrade to Premium" if not premium_status else "✨ Premium Content", callback_data="premium_content")],
+                [InlineKeyboardButton("✨ Upgrade to Premium" if not premium_status else "✨ Premium Content", 
+                 callback_data="premium_content")],
             ]
         )
-        
         
         sent_message = await message.reply_photo(
             photo=get_random_image(START_PICS),
             caption=START_MSG.format(
+                mention=message.from_user.mention,
+                botmention=(await client.get_me()).mention,  # Add this to get bot's mention
                 first=message.from_user.first_name,
                 last=message.from_user.last_name,
                 username=None if not message.from_user.username else '@' + message.from_user.username,
-                mention=message.from_user.mention,
                 id=message.from_user.id
             ),
             reply_markup=reply_markup,
-            effect_id=get_random_effect(),                 # effect added
+            parse_mode=ParseMode.HTML,
+            effect_id=get_random_effect(),
             quote=True
         )
-        #asyncio.create_task(schedule_auto_delete(client, sent_message.chat.id, sent_message.id, delay=autodelete))
         logger.info(f"Sent welcome message to user {user_id} with premium status: {premium_status}")
-
     
 #=====================================================================================##
 
