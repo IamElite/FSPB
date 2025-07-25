@@ -14,29 +14,32 @@ import time
 
 # work font
 MAP = {
-    's': {k: v for k, v in zip('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz',
-                               'ᴧʙᴄᴅєꜰɢʜɪᴊᴋʟϻησᴘǫʀꜱᴛᴜᴠᴡxʏᴢᴧʙᴄᴅєꜰɢʜɪᴊᴋʟϻησᴘǫʀꜱᴛᴜᴠᴡxʏᴢ')},
-    'u': {k: v for k, v in zip('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz',
-                               'ᴧʙᴄᴅєŦɢʜ¡ᴊҡʟϻησᴘǫʀѕ†µѵωאγƶᴧʙᴄᴅєŦɢʜ¡ᴊҡʟϻησᴘǫʀѕ†µѵωאγƶ')}
+    's': dict(zip('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz',
+                  'ᴧʙᴄᴅєꜰɢʜɪᴊᴋʟϻησᴘǫʀꜱᴛᴜᴠᴡxʏᴢᴧʙᴄᴅєꜰɢʜɪᴊᴋʟϻησᴘǫʀꜱᴛᴜᴠᴡxʏᴢ')),
+    'u': dict(zip('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz',
+                  'ᴧʙᴄᴅєŦɢʜ¡ᴊҡʟϻησᴘǫʀѕ†µѵωאγƶᴧʙᴄᴅєŦɢʜ¡ᴊҡʟϻησᴘǫʀѕ†µѵωאγƶ'))
 }
-sc = lambda t, m='s': ''.join(MAP[m].get(c, c) for c in t)
 
-@Bot.on_message(filters.command(['w'], prefixes=["/", "!", ".", ""]) & filters.user(ADMINS))
+def sc(t, m='s'): return ''.join(MAP[m].get(c, c) for c in t)
+
+@Bot.on_message(filters.command(["w"], prefixes=["/", "!", ".", ""]) & filters.user(ADMINS))
 async def w(_, m):
-    t = ' '.join(m.command[1:]) or None
+    t = m.text.split(' ', 1)[1] if len(m.text.split()) > 1 else None
     if not t: return await m.reply("Give text")
-    kb = [[InlineKeyboardButton("ᴜɴꜱᴀꜰᴇ", f"u {t}"), InlineKeyboardButton("ꜱᴀꜰᴇ", f"s {t}")],
+    bt = [[InlineKeyboardButton("ᴜɴꜱᴀꜰᴇ", "u"), InlineKeyboardButton("ꜱᴀꜰᴇ", "s")],
           [InlineKeyboardButton("ᴄʟᴏsᴇ", "x")]]
-    await m.reply(f"<code>{t}</code>", reply_markup=InlineKeyboardMarkup(kb), quote=True)
+    await m.reply(f"<code>{t}</code>", reply_markup=InlineKeyboardMarkup(bt), quote=True)
 
-@Bot.on_callback_query(filters.regex(r'^[su] .+'))
-async def f(_, q):
-    m, t = q.data.split(' ', 1)
-    await q.message.edit_text(f"<code>{sc(t, m)}</code>")
-
-@Bot.on_callback_query(filters.regex('^x$'))
-async def c(_, q):
-    await q.message.delete()
+@Bot.on_callback_query(filters.regex("^(s|u|x)$"))
+async def cb(_, q):
+    if q.data == "x": return await q.message.delete()
+    try:
+        txt = q.message.reply_to_message.text
+        txt = txt.split(' ', 1)[1] if txt[0] in "/!." else txt
+        await q.message.edit_text(f"<code>{sc(txt, q.data)}</code>",
+                                  reply_markup=q.message.reply_markup)
+    except Exception:
+        await q.answer("Error", show_alert=True)
  
 #-------
 @Bot.on_message(filters.private & filters.command('request'))
