@@ -386,7 +386,7 @@ async def start_command(client: Client, message):
         typing_msg = await client.send_sticker(
             chat_id=message.chat.id,
             sticker=random.choice(TYPING_STICKERS),
-            reply_to_message_id=message.id
+            reply_parameters=message.reply_parameters
         )
         await asyncio.sleep(1.5)
         await typing_msg.delete()
