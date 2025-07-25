@@ -5,6 +5,7 @@ Syntax: /id"""
 
 from pyrogram import filters
 from pyrogram.enums import ParseMode
+from pyrogram.types import LinkPreviewOptions
 
 from bot import Bot
 
@@ -21,15 +22,15 @@ async def universal_id(client, message):
     # 1) optional username
     if len(message.command) == 2:
         try:
-            split = message.text.split(None, 1)[1].strip()
+            split   = message.text.split(None, 1)[1].strip()
             user_id = (await client.get_users(split)).id
-            text += f"**[ᴜsᴇʀ ɪᴅ:](tg://user?id={user_id})** `{user_id}`\n"
+            text   += f"**[ᴜsᴇʀ ɪᴅ:](tg://user?id={user_id})** `{user_id}`\n"
         except Exception:
             return await message.reply_text("ᴛʜɪs ᴜsᴇʀ ᴅᴏᴇsɴ'ᴛ ᴇxɪsᴛ.", quote=True)
 
     # 2) chat id
     text += f"**[ᴄʜᴀᴛ ɪᴅ:](https://t.me/{chat.username})** `{chat.id}`\n\n" if chat.username \
-            else f"**[ᴄʜᴀᴛ ɪᴅ:]** `{chat.id}`\n\n"
+            else f"**ᴄʜᴀᴛ ɪᴅ:** `{chat.id}`\n\n"
 
     # 3) replied details
     if reply and not getattr(reply, "empty", True):
@@ -65,6 +66,6 @@ async def universal_id(client, message):
 
     await message.reply_text(
         text,
-        disable_web_page_preview=True,
+        link_preview_options=LinkPreviewOptions(is_disabled=True),
         parse_mode=ParseMode.DEFAULT,
     )
