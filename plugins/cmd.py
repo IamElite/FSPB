@@ -24,7 +24,7 @@ async def w(_,m):
  if not t:return await m.reply('text?')
  await m.reply(f'<code>{t}</code>',reply_markup=InlineKeyboardMarkup(kb()),quote=True)
 
-@app.on_callback_query(filters.regex('^[usx]$'))
+@Bot.on_callback_query(filters.regex('^[usx]$'))
 async def f(_,q):
  if q.data=='x':return await q.message.delete()
  t=q.message.reply_to_message.text.partition(' ')[2]
