@@ -382,10 +382,9 @@ async def start_command(client: Client, message):
             "CAACAgUAAyEFAASGx2_SAAIH-WiDkffLxbCPGnINAoOPvel2SPmqAALjGwACLxchVPzzVsvd2gSTHgQ"
         ]
         sticker = random.choice(TYPING_STICKERS)
-        task = asyncio.create_task(client.send_chat_action(message.chat.id, ChatAction.TYPING))
+        await client.send_chat_action(message.chat.id, ChatAction.TYPING)
         msg = await client.send_sticker(message.chat.id, sticker, reply_parameters=ReplyParameters(message_id=message.id))
         await asyncio.sleep(1.5)
-        task.cancel()
         await msg.delete()
         
         reply_markup = InlineKeyboardMarkup(
