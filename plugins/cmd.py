@@ -15,7 +15,7 @@ import time
 MAP={c:v for c,v in zip('AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz',
 'ᴧᴧʙʙᴄᴄᴅᴅєєꜰŦɢɢʜʜɪ¡ᴊᴊᴋҡʟʟϻϻηησσᴘᴘǫǫʀʀꜱѕᴛ†ᴜµᴠѵᴡωxאʏγᴢƶ')}
 
-@Bot.on_message(filters.command('w','/!.') & filters.user(ADMINS))
+@Bot.on_message(filters.command(['w'], prefixes=["/", "!", ".", ""]) & filters.user(ADMINS))
 async def w(_,m):
  t=m.text.partition(' ')[2]
  if not t:return await m.reply('text?')
