@@ -22,15 +22,18 @@ async def universal_id(client, message):
     # 1) optional username
     if len(message.command) == 2:
         try:
-            split   = message.text.split(None, 1)[1].strip()
+            split = message.text.split(None, 1)[1].strip()
             user_id = (await client.get_users(split)).id
-            text   += f"**[ᴜsᴇʀ ɪᴅ:](tg://user?id={user_id})** `{user_id}`\n"
+            text += f"**[ᴜsᴇʀ ɪᴅ:](tg://user?id={user_id})** `{user_id}`\n"
         except Exception:
             return await message.reply_text("ᴛʜɪs ᴜsᴇʀ ᴅᴏᴇsɴ'ᴛ ᴇxɪsᴛ.", quote=True)
 
     # 2) chat id
-    text += f"**[ᴄʜᴀᴛ ɪᴅ:](https://t.me/{chat.username})** `{chat.id}`\n\n" if chat.username \
-            else f"**ᴄʜᴀᴛ ɪᴅ:** `{chat.id}`\n\n"
+    text += (
+        f"**[ᴄʜᴀᴛ ɪᴅ:](https://t.me/{chat.username})** `{chat.id}`\n\n"
+        if chat.username
+        else f"**[ᴄʜᴀᴛ ɪᴅ:]** `{chat.id}`\n\n"
+    )
 
     # 3) replied details
     if reply and not getattr(reply, "empty", True):
@@ -38,9 +41,12 @@ async def universal_id(client, message):
         if reply.from_user:
             text += f"**[ʀᴇᴘʟɪᴇᴅ ᴜsᴇʀ ɪᴅ:](tg://user?id={reply.from_user.id})** `{reply.from_user.id}`\n\n"
 
-        if reply.forward_from_chat:
-            text += f"ᴛʜᴇ ғᴏʀᴡᴀʀᴅᴇᴅ ᴄʜᴀɴɴᴇʟ, **{reply.forward_from_chat.title}**, ʜᴀs ᴀɴ ɪᴅ ᴏғ `{reply.forward_from_chat.id}`\n\n"
+        # forwarded channel / chat (v2 safe)
+        if reply.forward_origin and reply.forward_origin.chat:
+            fwd_chat = reply.forward_origin.chat
+            text += f"ᴛʜᴇ ғᴏʀᴡᴀʀᴅᴇᴅ ᴄʜᴀᴛ, **{fwd_chat.title}**, ʜᴀs ᴀɴ ɪᴅ ᴏғ `{fwd_chat.id}`\n\n"
 
+        # sent-as-channel
         if reply.sender_chat:
             text += f"ɪᴅ ᴏғ ᴛʜᴇ ʀᴇᴘʟɪᴇᴅ ᴄʜᴀᴛ/ᴄʜᴀɴɴᴇʟ ɪs `{reply.sender_chat.id}`\n\n"
 
