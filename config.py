@@ -72,15 +72,15 @@ SECONDS = int(os.getenv("SECONDS", "200")) # auto delete in seconds
 PORT = os.environ.get("PORT", "8080")
 TG_BOT_WORKERS = int(os.environ.get("TG_BOT_WORKERS", "4"))
 START_MSG = os.environ.get("START_MESSAGE", """<blockquote>
-┌────── ˹ ɪɴғᴏʀᴍᴀᴛɪᴏɴ ˼─── ⏤͟͞●
-┆◍ ʜᴇʏ {mention}
-┆◍ ɪ ᴀᴍ {botmention} ʙᴏᴛ.
+┌────── <b>˹ ɪɴғᴏʀᴍᴀᴛɪᴏɴ ˼</b> ─── ⏤͟͞●
+┆◍ <b>ʜᴇʏ {mention}.</b>
+┆◍ <b>ɪ ᴀᴍ {botmention} ʙᴏᴛ.<b>
 └──────────────────────•</blockquote><blockquote expandable>
 ❀ <b>ꜰɪʟє-ᴛσ-ʟɪηᴋ ɢєηєʀᴧᴛσʀ</b> - <i>ᴜᴘʟσᴧᴅ ꜰɪʟєꜱ, ɢєᴛ ɪηꜱᴛᴧηᴛ ᴅɪʀєᴄᴛ ᴅσᴡηʟσᴧᴅ ʟɪηᴋꜱ.</i>
 ✤ <b>ʟɪηᴋ ϻᴧηᴧɢєʀ</b> – <i>ꜱᴛσʀєꜱ/σʀɢᴧηɪᴢєꜱ ɢʀσᴜᴘ ʟɪηᴋꜱ (ʀᴜʟєꜱ, ʀєꜱσᴜʀᴄєꜱ, єᴛᴄ.).</i>
 ❃ <b>ᴅᴜᴧʟ-ϻσᴅє</b> – <i>ᴡσʀᴋꜱ ᴧꜱ ʙσᴛʜ ᴘᴜʙʟɪᴄ ꜰɪʟє-ꜱʜᴧʀɪηɢ ʙσᴛ & ᴘʀɪᴠᴧᴛє ɢʀσᴜᴘ ᴛσσʟ.</i>
 ✮ <b>ᴧᴜᴛσϻᴧᴛєᴅ</b> – <i>ᴄσϻϻᴧηᴅꜱ ʟɪᴋєʟʏ ꜰσʀ ᴜᴘʟσᴧᴅꜱ, ꜱєᴧʀᴄʜєꜱ, ᴧηᴅ ᴧᴅϻɪη ᴛᴧꜱᴋꜱ.</i></blockquote>
-•────────────────────────•<blockquote>
+<b>•────────────────────────•</b><blockquote>
  ❖ <b>𝐏ᴏᴡᴇʀᴇᴅ ʙʏ</b> :- <a href="https://t.me/SyntaxRealm">˹ꜱʏηᴛᴧx-ʀєᴧʟϻ ˼ </a> ❤️‍🔥</blockquote>""")
 
 try:
