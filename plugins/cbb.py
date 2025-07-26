@@ -24,44 +24,39 @@ async def cb_handler(client: Bot, query: CallbackQuery):
             reply_markup=InlineKeyboardMarkup(
                 [
                     [
-                        InlineKeyboardButton("🔙 Back", callback_data="back_home"),
-                        InlineKeyboardButton("🔒 Close", callback_data="close"),
+                        InlineKeyboardButton("⇇ ʙᴀᴄᴋ ❈", callback_data="home"),
+                        InlineKeyboardButton("〆 ᴄʟᴏsᴇ 〆", callback_data="close"),
                     ]
                 ]
             ),
         )
 
-    elif data == "back_home":
+    elif data == "home":
         user_id = query.from_user.id
         premium_status = await is_premium_user(user_id)
 
-        await query.message.edit_caption(
-            caption=START_MSG.format(
-                first=query.from_user.first_name,
-                last=query.from_user.last_name,
-                username=None
-                if not query.from_user.username
-                else "@" + query.from_user.username,
-                mention=query.from_user.mention,
-                id=query.from_user.id,
-            ),
-            reply_markup=InlineKeyboardMarkup(
-                [
-                    [
-                        InlineKeyboardButton("😊 About Me", callback_data="about"),
-                        InlineKeyboardButton("🔒 Close", callback_data="close"),
-                    ],
-                    [
-                        InlineKeyboardButton(
-                            "✨ Upgrade to Premium"
-                            if not premium_status
-                            else "✨ Premium Content",
-                            callback_data="premium_content",
-                        )
-                    ],
-                ]
-            ),
+        reply_markup = InlineKeyboardMarkup(
+            [
+                [InlineKeyboardButton("❖ ᴛᴧᴘ тᴏ sᴇᴇ ᴍᴧɢɪᴄ ʙᴧʙʏ ❖", callback_data="about")],
+                [InlineKeyboardButton("˹ ❍ᴡɴᴇꝛ ˼", url=f"https://t.me/DvisDmBot?start"), InlineKeyboardButton("˹ ❍ᴡɴᴇꝛ 𝟮 ˼", url=f"https://t.me/DvisDmBot?start")],
+                [InlineKeyboardButton("〆 ᴄʟᴏsᴇ 〆", callback_data="close")],
+            ]
         )
+        
+        # If the original message has media → edit_caption, else → edit_text
+        if query.message.photo or query.message.video:
+            await query.message.edit_caption(
+                caption=START_MSG.format(
+                    first=query.from_user.first_name,
+                    last=query.from_user.last_name,
+                    username=None
+                    if not query.from_user.username
+                    else "@" + query.from_user.username,
+                    mention=query.from_user.mention,
+                    id=query.from_user.id,
+                ),
+                reply_markup=reply_markup,
+            )
 
     elif data == "close":
         await query.message.delete()
