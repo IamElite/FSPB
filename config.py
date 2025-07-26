@@ -74,7 +74,7 @@ TG_BOT_WORKERS = int(os.environ.get("TG_BOT_WORKERS", "4"))
 START_MSG = os.environ.get("START_MESSAGE", """<blockquote>
 ┌────── ˹ ɪɴғᴏʀᴍᴀᴛɪᴏɴ ˼─── ⏤͟͞●
 ┆◍ ʜᴇʏ {mention}
-┆◍ ɪ'ᴍ : {botmention} 
+┆◍ ɪ ᴀᴍ {botmention} ʙᴏᴛ.
 └──────────────────────•</blockquote><blockquote expandable>
 ❀ <b>ꜰɪʟє-ᴛσ-ʟɪηᴋ ɢєηєʀᴧᴛσʀ</b> - <i>ᴜᴘʟσᴧᴅ ꜰɪʟєꜱ, ɢєᴛ ɪηꜱᴛᴧηᴛ ᴅɪʀєᴄᴛ ᴅσᴡηʟσᴧᴅ ʟɪηᴋꜱ.</i>
 ✤ <b>ʟɪηᴋ ϻᴧηᴧɢєʀ</b> – <i>ꜱᴛσʀєꜱ/σʀɢᴧηɪᴢєꜱ ɢʀσᴜᴘ ʟɪηᴋꜱ (ʀᴜʟєꜱ, ʀєꜱσᴜʀᴄєꜱ, єᴛᴄ.).</i>
