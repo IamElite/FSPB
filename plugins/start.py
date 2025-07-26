@@ -382,15 +382,16 @@ async def start_command(client: Client, message):
             "CAACAgUAAyEFAASGx2_SAAIH-WiDkffLxbCPGnINAoOPvel2SPmqAALjGwACLxchVPzzVsvd2gSTHgQ"
         ]
         sticker = random.choice(TYPING_STICKERS)
-        await client.send_chat_action(message.chat.id, ChatAction.TYPING)
         msg = await client.send_sticker(message.chat.id, sticker, reply_parameters=ReplyParameters(message_id=message.id))
+        await client.send_chat_action(message.chat.id, ChatAction.TYPING)
         await asyncio.sleep(1.5)
         await msg.delete()
         
         reply_markup = InlineKeyboardMarkup(
             [
-                [InlineKeyboardButton("😊 About Me", callback_data="about"), InlineKeyboardButton("🔒 Close", callback_data="close")],
-                [InlineKeyboardButton("✨ Upgrade to Premium" if not premium_status else "✨ Premium Content", callback_data="premium_content")],
+                [InlineKeyboardButton("❖ ᴛᴧᴘ тᴏ sᴇᴇ ᴍᴧɢɪᴄ ʙᴧʙʏ ❖", callback_data="about")],
+                [InlineKeyboardButton("˹ ❍ᴡɴᴇꝛ ˼", url=f"https://t.me/DvisDmBot?start"), InlineKeyboardButton("˹ ❍ᴡɴᴇꝛ 𝟮 ˼", url=f"https://t.me/DvisDmBot?start")],
+                [InlineKeyboardButton("〆 ᴄʟᴏsᴇ 〆", callback_data="close")],
             ]
         )
         
