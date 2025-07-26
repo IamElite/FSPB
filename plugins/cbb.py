@@ -35,27 +35,26 @@ async def cb_handler(client: Bot, query: CallbackQuery):
         user_id = query.from_user.id
         premium_status = await is_premium_user(user_id)
 
-        reply_markup = InlineKeyboardMarkup(
-            [
-                [InlineKeyboardButton("❖ ᴛᴧᴘ тᴏ sᴇᴇ ᴍᴧɢɪᴄ ʙᴧʙʏ ❖", callback_data="about")],
-                [InlineKeyboardButton("˹ ❍ᴡɴᴇꝛ ˼", url=f"https://t.me/DvisDmBot?start"), InlineKeyboardButton("˹ ❍ᴡɴᴇꝛ 𝟮 ˼", url=f"https://t.me/DvisDmBot?start")],
-                [InlineKeyboardButton("〆 ᴄʟᴏsᴇ 〆", callback_data="close")],
-            ]
+        await query.message.edit_text(
+            text=START_MSG.format(
+                mention=query.from_user.mention,
+                botmention=(await client.get_me()).mention,
+                first=query.from_user.first_name,
+                last=query.from_user.last_name,
+                username=None
+                if not query.from_user.username
+                else '@' + query.from_user.username,
+                id=query.from_user.id,
+            ),
+            reply_markup=InlineKeyboardMarkup(
+                [
+                    [InlineKeyboardButton("❖ ᴛᴧᴘ тᴏ sᴇᴇ ᴍᴧɢɪᴄ ʙᴧʙʏ ❖", callback_data="about")],
+                    [InlineKeyboardButton("˹ ❍ᴡɴᴇꝛ ˼", url=f"https://t.me/DvisDmBot?start"), InlineKeyboardButton("˹ ❍ᴡɴᴇꝛ 𝟮 ˼", url=f"https://t.me/DvisDmBot?start")],
+                    [InlineKeyboardButton("〆 ᴄʟᴏsᴇ 〆", callback_data="close")],
+                ]
+            ),
+            parse_mode=ParseMode.HTML,
         )
-        
-        # If the original message has media → edit_caption, else → edit_text
-        if query.message.photo or query.message.video:
-            await query.message.edit_caption(
-                caption=START_MSG.format(
-                    mention=message.from_user.mention,
-                    botmention=(await client.get_me()).mention,
-                    first=message.from_user.first_name,
-                    last=message.from_user.last_name,
-                    username=None if not message.from_user.username else '@' + message.from_user.username,
-                    id=message.from_user.id
-                ),
-                reply_markup=reply_markup,
-            )
 
     elif data == "close":
         await query.message.delete()
