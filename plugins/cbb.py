@@ -17,10 +17,10 @@ async def cb_handler(client: Bot, query: CallbackQuery):
         await query.message.edit_text(
             text=(
                 "<i>σᴜʀ ʀєᴧʟϻ..</i>\n\n"
-                "<blockquote>  <b>● ʟєɢᴧᴄʏ</b> <a href='https://t.me/SyntaxRealm'>˹ꜱʏηᴛᴧx-ʀєᴧʟϻ˼</a>\n"
-                "  <b>● ꜱᴜᴘᴘᴏꝛᴛ ➥</b> 4 ᴘʟᴧʏєʀꜱ = ɢᴧϻє σᴠєʀ\n"
-                "  <b>● ʙσᴛ ꜰᴧᴛʜєʀ ➥</b> <a href='https://t.me/DshDm_bot?start'>˹σꜰꜰɪᴄɪᴧʟ-ᴅᴜʀɢєꜱʜ˼</a>\n"
-                "  <b>● σᴘᴘσηєηᴛ ➥</b> ϻє ᴠꜱ ϻє</blockquote>\n"
+                "<blockquote>  <b>● ʟєɢᴧᴄʏ</b><i> <a href='https://t.me/SyntaxRealm'>˹ꜱʏηᴛᴧx-ʀєᴧʟϻ˼</a></i>\n"
+                "  <b>● ꜱᴜᴘᴘᴏꝛᴛ ➥</b><i> 4 ᴘʟᴧʏєʀꜱ = ɢᴧϻє σᴠєʀ</i>\n"
+                "  <b>● ʙσᴛ ꜰᴧᴛʜєʀ ➥</b><i> <a href='https://t.me/DshDm_bot?start'>˹σꜰꜰɪᴄɪᴧʟ-ᴅᴜʀɢєꜱʜ˼</a></i>\n"
+                "  <b>● σᴘᴘσηєηᴛ ➥</b><i>|| ϻє ᴠꜱ ϻє ||</i></blockquote>\n"
                 "<b>ησᴛє :-</b>\n"
                 "<i>ʏσᴜ ᴄᴧη ᴜꜱє σᴜʀ ᴄσηᴛєηᴛ ꜰσʀ ᴄσϻϻєʀᴄɪᴧʟ ᴘᴜʀᴘσꜱєꜱ, ησ ᴄσᴘʏʀɪɢʜᴛ ᴡɪʟʟ ʙє ʟσꜱᴛ ꜰʀσϻ σᴜʀ ꜱɪᴅє.</i>\n\n"
                 "<i>ꜱᴧʏσηᴧʀᴧ!!</i>"
