@@ -237,6 +237,8 @@ async def start_command(client: Client, message):
             logger.info(f"Added new user with ID: {user_id}")
         except Exception as e:
             logger.error(f"Error adding user {user_id}: {e}")
+    
+    await message.react(random.choice(D))
 
     premium_status = await is_premium_user(user_id)
 
