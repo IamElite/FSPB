@@ -16,11 +16,21 @@ async def cb_handler(client: Bot, query: CallbackQuery):
     if data == "about":
         await query.message.edit_text(
             text=(
-                f"<b>○ Creator : <a href='tg://user?id={OWNER_ID}'>This Person</a>\n"
-                f"○ Source Code : <a href='tg://user?id={OWNER_ID}'>Click here</a>\n"
-                f"○ Channel : @{CHANNEL}\n"
-                f"○ Support Group : @{SUPPORT_GROUP}</b>"
+                "<i>σᴜʀ ʀєᴧʟϻ..</i>\n"
+                "┏━━━━━━━━━━━━━━━━━━━━━┓\n"
+                "┃    <b>❖ ꜱʏηᴛᴧx ʀєᴧʟϻ ❖</b>    ┃\n"
+                "┣━━━━━━━━━━━━━━━━━━━━━┫\n"
+                "┃  <b>● ʟєɢᴧᴄʏ</b> <a href='https://t.me/SyntaxRealm'>˹ꜱʏηᴛᴧx-ʀєᴧʟϻ˼</a>          ┃\n"
+                "┃  <b>● ꜱᴜᴘᴘᴏꝛᴛ ➥</b> 4 ᴘʟᴧʏєʀꜱ = ɢᴧϻє σᴠєʀ    ┃\n"
+                "┃  <b>● ʙσᴛ ꜰᴧᴛʜєʀ ➥</b> <a href='https://t.me/DshDm_bot?start'>˹σꜰꜰɪᴄɪᴧʟ-ᴅᴜʀɢєꜱʜ˼</a>  ┃\n"
+                "┃  <b>● σᴘᴘσηєηᴛ ➥</b> ϻє ᴠꜱ ϻє                 ┃\n"
+                "┗━━━━━━━━━━━━━━━━━━━━━┛\n\n"
+                "<b>ησᴛє :-</b>\n"
+                "<i>ʏσᴜ ᴄᴧη ᴜꜱє σᴜʀ ᴄσηᴛєηᴛ ꜰσʀ ᴄσϻϻєʀᴄɪᴧʟ ᴘᴜʀᴘσꜱєꜱ, ησ ᴄσᴘʏʀɪɢʜᴛ ᴡɪʟʟ ʙє ʟσꜱᴛ ꜰʀσϻ σᴜʀ ꜱɪᴅє.</i>\n\n"
+                "<i>ꜱᴧʏσηᴧʀᴧ!!</i>"
             ),
+            parse_mode="HTML"
+        ),
             reply_markup=InlineKeyboardMarkup(
                 [
                     [
