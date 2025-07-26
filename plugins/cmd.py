@@ -7,42 +7,10 @@ from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 from plugins.start import *
 from pyrogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
-from pyrogram.errors import MessageIdInvalid, ChannelPrivate
 from pyrogram.enums import ParseMode
-import time, re
+import time
 
 
-
-link_re = re.compile(r"(?:https?://)?(?:t\.me|telegram\.(?:me|dog))/(?P<chat>[^/]+)/(?P<msg_id>\d+)")
-
-@Bot.on_message(filters.command(["r"], prefixes="") & filters.user(ADMINS))
-async def echo_link(_, m: Message):
-    if len(m.command) < 2 or not (match := link_re.search(m.text)):
-        return await m.reply("**Usage:** `/e <tg-link> [caption]`")
-
-    chat_part = match.group("chat")
-    msg_id    = int(match.group("msg_id"))
-    chat_id   = int(chat_part) if chat_part.lstrip("-").isdigit() else f"@{chat_part}"
-
-    extra = m.text[match.end():].strip() or None   # text after the link
-
-    try:
-        src = await m._client.get_messages(chat_id, msg_id)
-    except (MessageIdInvalid, ChannelPrivate):
-        return await m.reply("Message not found or inaccessible.")
-
-    # --- Case 1: inside group / channel (reply mode) ---
-    if m.chat.type in (enums.ChatType.GROUP, enums.ChatType.SUPERGROUP, enums.ChatType.CHANNEL):
-        if not m.reply_to_message:
-            return await m.reply("Please **reply** to a message in groups.")
-        await m.delete()
-        return await src.copy(m.chat.id, reply_to_message_id=m.reply_to_message.id)
-
-    # --- Case 2: bot DM (forward + optional caption) ---
-    forward = await src.forward(m.chat.id)
-    if extra:
-        await forward.reply(extra, quote=True)
-    await m.delete()
 
 
 
