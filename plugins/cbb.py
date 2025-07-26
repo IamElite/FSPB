@@ -47,13 +47,12 @@ async def cb_handler(client: Bot, query: CallbackQuery):
         if query.message.photo or query.message.video:
             await query.message.edit_caption(
                 caption=START_MSG.format(
-                    first=query.from_user.first_name,
-                    last=query.from_user.last_name,
-                    username=None
-                    if not query.from_user.username
-                    else "@" + query.from_user.username,
-                    mention=query.from_user.mention,
-                    id=query.from_user.id,
+                    mention=message.from_user.mention,
+                    botmention=(await client.get_me()).mention,
+                    first=message.from_user.first_name,
+                    last=message.from_user.last_name,
+                    username=None if not message.from_user.username else '@' + message.from_user.username,
+                    id=message.from_user.id
                 ),
                 reply_markup=reply_markup,
             )
