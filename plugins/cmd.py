@@ -12,6 +12,18 @@ from pyrogram.enums import ParseMode
 import time
 
 
+
+# eco.py text formats
+@Bot.on_message(filters.command(["eco", "e"], prefixes=["/", "!", ".", ""]) & filters.reply & filters.user(ADMINS))
+async def eco_reply(_, m):
+    if not (r := m.reply_to_message):
+        return await m.reply("Reply to a message.")
+    if len(parts := m.text.split(maxsplit=1)) < 2:
+        return await m.reply("Give text to echo.")
+    await m.delete()
+    await r.reply(parts[1])
+
+
 # work font
 MAP = {
     's': dict(zip('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz',
