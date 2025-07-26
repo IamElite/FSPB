@@ -7,7 +7,6 @@ from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 from plugins.start import *
 from pyrogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
-from pyrogram.types import InlineKeyboardButton as IKB, InlineKeyboardMarkup as 
 from pyrogram.errors import MessageIdInvalid, ChannelPrivate
 from pyrogram.enums import ParseMode
 import time, re
