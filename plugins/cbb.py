@@ -17,22 +17,20 @@ async def cb_handler(client: Bot, query: CallbackQuery):
         await query.message.edit_text(
             text=(
                 "<i>σᴜʀ ʀєᴧʟϻ..</i>\n\n"
-                "<blockquote>  <b>● ʟєɢᴧᴄʏ</b><i> <a href='https://t.me/SyntaxRealm'>˹ꜱʏηᴛᴧx-ʀєᴧʟϻ˼</a></i>\n"
+                "<blockquote>  <b>● ʟєɢᴧᴄʏ ➥</b><i> <a href='https://t.me/SyntaxRealm'>˹ꜱʏηᴛᴧx-ʀєᴧʟϻ˼</a></i>\n"
                 "  <b>● ꜱᴜᴘᴘᴏꝛᴛ ➥</b><i> 4 ᴘʟᴧʏєʀꜱ = ɢᴧϻє σᴠєʀ</i>\n"
                 "  <b>● ʙσᴛ ꜰᴧᴛʜєʀ ➥</b><i> <a href='https://t.me/DshDm_bot?start'>˹σꜰꜰɪᴄɪᴧʟ-ᴅᴜʀɢєꜱʜ˼</a></i>\n"
-                "  <b>● σᴘᴘσηєηᴛ ➥</b><i>|| ϻє ᴠꜱ ϻє ||</i></blockquote>\n"
-                "<b>ησᴛє :-</b>\n"
-                "<i>ʏσᴜ ᴄᴧη ᴜꜱє σᴜʀ ᴄσηᴛєηᴛ ꜰσʀ ᴄσϻϻєʀᴄɪᴧʟ ᴘᴜʀᴘσꜱєꜱ, ησ ᴄσᴘʏʀɪɢʜᴛ ᴡɪʟʟ ʙє ʟσꜱᴛ ꜰʀσϻ σᴜʀ ꜱɪᴅє.</i>\n\n"
+                "  <b>● σᴘᴘσηєηᴛ ➥</b><i> || ϻє ᴠꜱ ϻє ||</i></blockquote>\n"
+                "<b>❖ ησᴛє :-</b>\n"
+                "<i>ᴄσϻϻєʀᴄɪᴧʟ ᴜꜱє ᴧʟʟσᴡєᴅ, ᴄσᴘʏʀɪɢʜᴛ ꜰʀєє σᴜʀ ꜱɪᴅє.</i></blockquote>\n\n"
                 "<i>ꜱᴧʏσηᴧʀᴧ!!</i>"
             ),
             parse_mode=ParseMode.HTML,
             disable_web_page_preview=True,
             reply_markup=InlineKeyboardMarkup(
                 [
-                    [
-                        InlineKeyboardButton("⇇ ʙᴀᴄᴋ ❈", callback_data="home"),
-                        InlineKeyboardButton("〆 ᴄʟᴏsᴇ 〆", callback_data="close"),
-                    ]
+                    [InlineKeyboardButton("⇇ ʙᴀᴄᴋ ❈", callback_data="home"), InlineKeyboardButton("˹ ❍ᴡɴᴇꝛ ˼", url=f"https://t.me/DvisDmBot?start")]
+                    [InlineKeyboardButton("〆 ᴄʟᴏsᴇ 〆", callback_data="close"),]
                 ]
             ),
         )
