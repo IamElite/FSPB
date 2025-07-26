@@ -29,7 +29,8 @@ async def cb_handler(client: Bot, query: CallbackQuery):
                 "<i>ʏσᴜ ᴄᴧη ᴜꜱє σᴜʀ ᴄσηᴛєηᴛ ꜰσʀ ᴄσϻϻєʀᴄɪᴧʟ ᴘᴜʀᴘσꜱєꜱ, ησ ᴄσᴘʏʀɪɢʜᴛ ᴡɪʟʟ ʙє ʟσꜱᴛ ꜰʀσϻ σᴜʀ ꜱɪᴅє.</i>\n\n"
                 "<i>ꜱᴧʏσηᴧʀᴧ!!</i>"
             ),
-            parse_mode="HTML",
+            parse_mode=ParseMode.HTML,
+            disable_web_page_preview=True,
             reply_markup=InlineKeyboardMarkup(
                 [
                     [
